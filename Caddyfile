@@ -1,5 +1,5 @@
 {$PORT:80} {
-	tls off
+	tls internal
 	root * .
 	file_server
 	try_files {path} /index.html
