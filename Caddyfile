@@ -1,4 +1,4 @@
-{$PORT:80} {
+:{$PORT:80} {
 	tls internal
 	root * .
 	file_server
