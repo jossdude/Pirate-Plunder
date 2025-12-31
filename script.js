@@ -1,11 +1,3 @@
-// Debug: Verify script is loading
-console.log('=== SCRIPT.JS LOADING ===');
-console.log('Document ready state:', document.readyState);
-console.log('Body exists:', !!document.body);
-
-// Simple test - change page background color to verify script runs
-document.body.style.backgroundColor = '#f0f0f0';
-console.log('Background color changed - script is running!');
 
 // Set viewport height to account for mobile browser UI
 function setViewportHeight() {
@@ -31,12 +23,6 @@ const numberWheel = document.getElementById('number-wheel');
 const letterContentGroup = document.getElementById('letter-wheel-content');
 const numberContentGroup = document.getElementById('number-wheel-content');
 
-// Debug: Check if elements exist
-console.log('Elements check:');
-console.log('letterResult:', letterResult);
-console.log('letterWheel:', letterWheel);
-console.log('letterContentGroup:', letterContentGroup);
-console.log('numberContentGroup:', numberContentGroup);
 
 // Track wheel rotation states (using objects so they're passed by reference)
 const letterWheelRotation = { value: 0 };
@@ -131,23 +117,14 @@ function createSpinnerContent(container, items) {
 }
 
 // Initialize spinners
-console.log('Initializing spinners...');
-console.log('Letter content group:', letterContentGroup);
-console.log('Number content group:', numberContentGroup);
-
 if (!letterContentGroup || !numberContentGroup) {
     console.error('Content groups not found!');
-    alert('ERROR: Content groups not found! Check console for details.');
 } else {
     createSpinnerContent(letterContentGroup, letters);
     createSpinnerContent(numberContentGroup, numbers);
-    console.log('Spinner content created');
-    console.log('Letter content children:', letterContentGroup.children.length);
-    console.log('Number content children:', numberContentGroup.children.length);
 }
 
-// Keep full viewBox - CSS will handle the clipping
-// The SVG will show the full circle, and CSS overflow will clip to show only the visible half
+// Keep full viewBox - CSS will handle the clipping to show half of each spinner
 
 // Set initial results
 if (letterResult) letterResult.textContent = letters[0];
