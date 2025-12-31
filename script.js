@@ -1,3 +1,12 @@
+// Debug: Verify script is loading
+console.log('=== SCRIPT.JS LOADING ===');
+console.log('Document ready state:', document.readyState);
+console.log('Body exists:', !!document.body);
+
+// Simple test - change page background color to verify script runs
+document.body.style.backgroundColor = '#f0f0f0';
+console.log('Background color changed - script is running!');
+
 // Set viewport height to account for mobile browser UI
 function setViewportHeight() {
     const vh = window.innerHeight * 0.01;

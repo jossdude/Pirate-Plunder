@@ -142,6 +142,8 @@ main {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+    border: 3px solid purple; /* Debug - should see purple border */
+    min-height: 200px;
 }
 
 .spinner-container {
