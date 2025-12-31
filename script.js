@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.20';
+const VERSION = '1.0.21';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -169,9 +169,9 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
     
     // Physics parameters for realistic spinner
     const startVelocity = 10 + getSecureRandom(8); // Initial angular velocity (degrees per frame)
-    const friction = 0.96; // Friction coefficient (slows down over time) - increased for quicker slowdown
-    const minVelocity = 0.5; // Minimum velocity before snapping to target - increased to stop sooner
-    const minDuration = 1500; // Minimum spin duration in milliseconds - reduced for quicker animation
+    const friction = 0.965; // Friction coefficient (slows down over time) - balanced for reasonable slowdown
+    const minVelocity = 0.4; // Minimum velocity before snapping to target - allows slightly longer spin
+    const minDuration = 2000; // Minimum spin duration in milliseconds - increased for longer spin
     
     let velocity = startVelocity;
     let rotation = startRotation;
@@ -221,6 +221,7 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
             
             // Remove spinning class after brief transition
             setTimeout(() => {
+                wheel.style.transition = 'none'; // Permanently disable transitions to prevent jumps
                 wheel.classList.remove('spinning');
                 resultElement.classList.remove('rolling');
                 if (onComplete) onComplete();

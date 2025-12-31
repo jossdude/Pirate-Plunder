@@ -293,10 +293,19 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    margin: 20px auto;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-family: inherit;
+    outline: none;
+}
+
+.roll-button:focus {
+    outline: none;
+}
+
+.roll-button:focus-visible {
+    outline: none;
 }
 
 .roll-button:hover {
