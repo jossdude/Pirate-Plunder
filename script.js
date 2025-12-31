@@ -118,6 +118,9 @@ function createSpinnerContent(container, items) {
 createSpinnerContent(letterContentGroup, letters);
 createSpinnerContent(numberContentGroup, numbers);
 
+// Keep full viewBox - CSS will handle the clipping
+// The SVG will show the full circle, and CSS overflow will clip to show only the visible half
+
 // Set initial results
 letterResult.textContent = letters[0];
 numberResult.textContent = numbers[0];

@@ -173,16 +173,17 @@ main {
     height: var(--spinner-diameter);
     transform-origin: center center;
     will-change: transform;
+    display: block;
 }
 
 .spinner-left-container .spinner-circle {
     left: calc(-1 * var(--spinner-radius));
-    top: 0;
+    bottom: 0;
 }
 
 .spinner-right-container .spinner-circle {
     right: calc(-1 * var(--spinner-radius));
-    top: 0;
+    bottom: 0;
 }
 
 .spinner-svg {
@@ -191,6 +192,7 @@ main {
     transform-origin: center;
     transition: transform 0.1s linear;
     will-change: transform;
+    display: block;
 }
 
 .spinner-svg.spinning {
