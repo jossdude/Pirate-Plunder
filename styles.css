@@ -14,8 +14,8 @@
     --pirate-red: #8b0000;
     --pirate-orange: #ff8c00;
     --vh: 1vh;
-    --spinner-diameter: 400px;
-    --spinner-radius: 200px;
+    --spinner-diameter: 750px;
+    --spinner-radius: 375px;
 }
 
 
@@ -143,16 +143,16 @@ main {
 
 .spinner-left-container {
     position: absolute;
-    left: calc(-1 * var(--spinner-diameter) / 2);
+    left: calc(-1 * var(--spinner-diameter) / 2 + 0.15 * var(--spinner-radius));
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(calc(-50% - 0.666667 * var(--spinner-radius)));
 }
 
 .spinner-right-container {
     position: absolute;
-    right: calc(-1 * var(--spinner-diameter) / 2);
+    right: calc(-1 * var(--spinner-diameter) / 2 + 0.15 * var(--spinner-radius));
     top: 50%;
-    transform: translateY(-50%);
+    transform: translateY(calc(-50% + 0.666667 * var(--spinner-radius)));
 }
 
 .spinner-divider {
@@ -172,13 +172,6 @@ main {
     display: block;
 }
 
-.spinner-left-container .spinner-circle {
-    /* Full circle centered */
-}
-
-.spinner-right-container .spinner-circle {
-    /* Full circle centered */
-}
 
 .spinner-svg {
     width: 100%;
@@ -192,6 +185,11 @@ main {
 .spinner-svg.spinning {
     transition: none;
     will-change: transform;
+}
+
+.spinner-svg.locked {
+    transition: none !important;
+    will-change: auto;
 }
 
 .result-display {
@@ -339,8 +337,8 @@ footer {
 /* Mobile Responsive */
 @media (max-width: 768px) {
     :root {
-        --spinner-diameter: 300px;
-        --spinner-radius: 150px;
+        --spinner-diameter: 450px;
+        --spinner-radius: 225px;
     }
     
     body {
@@ -414,8 +412,8 @@ footer {
 
 @media (max-width: 480px) {
     :root {
-        --spinner-diameter: 240px;
-        --spinner-radius: 120px;
+        --spinner-diameter: 360px;
+        --spinner-radius: 180px;
     }
     
     body {

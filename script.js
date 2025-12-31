@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.21';
+const VERSION = '1.0.23';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -37,9 +37,9 @@ const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 const numbers = Array.from({length: 18}, (_, i) => i + 1);
 
 // Spinner dimensions
-const SPINNER_CENTER_X = 300;
-const SPINNER_CENTER_Y = 300;
-const SPINNER_RADIUS = 250;
+const SPINNER_CENTER_X = 375;
+const SPINNER_CENTER_Y = 375;
+const SPINNER_RADIUS = 375;
 
 // Generate cryptographically secure random number in range [0, max)
 function getSecureRandom(max) {
@@ -180,6 +180,7 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
     const startTime = Date.now();
     
     wheel.classList.add('spinning');
+    wheel.classList.remove('locked'); // Remove locked class when starting new spin
     wheel.style.transition = 'none'; // Remove CSS transition for manual control
     wheel.style.transform = `rotate(${rotation}deg)`;
     
@@ -219,13 +220,33 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
             wheel.style.transform = `rotate(${targetRotation}deg)`;
             rotationState.value = targetRotation; // Update tracked rotation
             
-            // Remove spinning class after brief transition
+            // Wait for transition to complete, then lock position
+            const handleTransitionEnd = (e) => {
+                // Only handle transform transitions
+                if (e.target === wheel && e.propertyName === 'transform') {
+                    wheel.removeEventListener('transitionend', handleTransitionEnd);
+                    // Permanently disable transitions and lock position
+                    wheel.style.transition = 'none';
+                    wheel.style.transform = `rotate(${targetRotation}deg)`; // Ensure exact position
+                    wheel.classList.remove('spinning');
+                    wheel.classList.add('locked'); // Add locked class to prevent CSS transitions
+                    resultElement.classList.remove('rolling');
+                    if (onComplete) onComplete();
+                }
+            };
+            
+            wheel.addEventListener('transitionend', handleTransitionEnd);
+            
+            // Fallback timeout in case transitionend doesn't fire
             setTimeout(() => {
-                wheel.style.transition = 'none'; // Permanently disable transitions to prevent jumps
+                wheel.removeEventListener('transitionend', handleTransitionEnd);
+                wheel.style.transition = 'none';
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
                 wheel.classList.remove('spinning');
+                wheel.classList.add('locked'); // Add locked class to prevent CSS transitions
                 resultElement.classList.remove('rolling');
                 if (onComplete) onComplete();
-            }, 200);
+            }, 250);
             
             return;
         }
