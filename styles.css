@@ -12,17 +12,24 @@
     --pirate-brown: #8b4513;
     --pirate-cream: #f5e6d3;
     --pirate-red: #8b0000;
+    --vh: 1vh;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, var(--pirate-dark-blue) 0%, var(--pirate-navy) 100%);
     min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 10px;
     color: var(--pirate-cream);
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
 }
 
 .container {
@@ -42,11 +49,14 @@ header {
 }
 
 h1 {
-    font-size: 2.5rem;
+    font-size: clamp(1.1rem, 5vw, 2.5rem);
     color: var(--pirate-gold);
     text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
     margin-bottom: 10px;
     letter-spacing: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .subtitle {
@@ -187,18 +197,19 @@ footer {
     body {
         padding: 5px;
         align-items: flex-start;
-        overflow-y: auto;
+        height: calc(var(--vh, 1vh) * 100);
     }
     
     .container {
         padding: 5px 0;
-        min-height: calc(100vh - 10px);
-        max-height: calc(100vh - 10px);
+        height: 100%;
+        max-height: 100%;
         justify-content: space-between;
+        overflow: hidden;
     }
     
     h1 {
-        font-size: 1.5rem;
+        font-size: clamp(1.1rem, 4vw, 1.5rem);
         margin-bottom: 5px;
     }
     
@@ -256,16 +267,18 @@ footer {
 @media (max-width: 480px) {
     body {
         padding: 3px;
+        height: calc(var(--vh, 1vh) * 100);
     }
     
     .container {
-        min-height: calc(100vh - 6px);
-        max-height: calc(100vh - 6px);
+        height: 100%;
+        max-height: 100%;
         padding: 3px 0;
+        overflow: hidden;
     }
     
     h1 {
-        font-size: 1.1rem;
+        font-size: clamp(0.9rem, 3.5vw, 1.1rem);
         letter-spacing: 1px;
         margin-bottom: 3px;
     }
