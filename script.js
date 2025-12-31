@@ -108,8 +108,8 @@ const numberColors = [
 createWheelSegments(letterSegmentsGroup, letters, letterColors);
 createWheelSegments(numberSegmentsGroup, numbers, numberColors);
 
-// Spin wheel with physics
-function spinWheel(wheel, items, resultElement, spinDuration = 3000) {
+// Spin wheel with realistic physics
+function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete = null) {
     // Generate random target using secure randomness
     const targetIndex = getSecureRandom(items.length);
     const targetItem = items[targetIndex];
@@ -120,8 +120,6 @@ function spinWheel(wheel, items, resultElement, spinDuration = 3000) {
     // Pointer is at top (0 degrees / -90 degrees from SVG coordinate system)
     // Each segment starts at index * anglePerSegment - 90 degrees
     // We want the center of the target segment to align with the pointer (top)
-    // Segment center = (index * anglePerSegment + anglePerSegment/2 - 90) degrees
-    // To align center with top (0 degrees), we need to rotate by:
     const segmentCenterAngle = targetIndex * anglePerSegment + anglePerSegment / 2 - 90;
     const targetAngle = -segmentCenterAngle;
     
@@ -131,57 +129,102 @@ function spinWheel(wheel, items, resultElement, spinDuration = 3000) {
     
     // Get current rotation (handle initial state)
     const currentTransform = wheel.style.transform || 'rotate(0deg)';
-    const currentRotation = parseFloat(currentTransform.match(/-?\d+\.?\d*/)?.[0] || 0);
+    let currentRotation = parseFloat(currentTransform.match(/-?\d+\.?\d*/)?.[0] || 0);
     
-    // Apply spinning animation with easing
+    // Normalize current rotation to 0-360 range
+    currentRotation = ((currentRotation % 360) + 360) % 360;
+    const targetRotation = currentRotation + finalRotation;
+    
+    // Physics parameters for realistic spinner
+    const startVelocity = 15 + getSecureRandom(10); // Initial angular velocity (degrees per frame) - varies for realism
+    const friction = 0.985; // Friction coefficient (slows down over time)
+    const minVelocity = 0.15; // Minimum velocity before snapping to target
+    
+    let velocity = startVelocity;
+    let rotation = currentRotation;
+    let totalRotation = 0;
+    let isDecelerating = false;
+    
     wheel.classList.add('spinning');
-    wheel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.17, 0.67, 0.12, 0.99)`;
-    wheel.style.transform = `rotate(${currentRotation + finalRotation}deg)`;
+    wheel.style.transition = 'none'; // Remove CSS transition for manual control
     
-    // Update result display during spin
-    let spinProgress = 0;
-    const updateInterval = setInterval(() => {
-        spinProgress += 50;
-        const progress = Math.min(spinProgress / spinDuration, 1);
-        // Easing function for smoother animation
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-        const currentRotationValue = currentRotation + (finalRotation * easedProgress);
+    // Animation loop with realistic physics
+    function animate() {
+        // Apply velocity
+        rotation += velocity;
+        totalRotation += Math.abs(velocity);
+        
+        // Apply friction (deceleration) - more aggressive as it slows
+        if (velocity > 1) {
+            velocity *= friction;
+        } else {
+            // More aggressive deceleration when slow
+            velocity *= 0.95;
+        }
+        
+        // Update wheel rotation
+        wheel.style.transform = `rotate(${rotation}deg)`;
         
         // Calculate which segment is under the pointer
-        const normalizedRotation = ((currentRotationValue % 360) + 360) % 360;
+        const normalizedRotation = ((rotation % 360) + 360) % 360;
         const pointerAngle = 90; // Pointer is at top (90 degrees in SVG coordinates)
         const adjustedAngle = (pointerAngle - normalizedRotation + 360) % 360;
         const currentIndex = Math.floor(adjustedAngle / anglePerSegment) % items.length;
         
         resultElement.textContent = items[currentIndex];
-    }, 50);
-    
-    // Set final result
-    setTimeout(() => {
-        clearInterval(updateInterval);
-        resultElement.textContent = targetItem;
-        resultElement.classList.add('rolling');
-        wheel.classList.remove('spinning');
         
-        setTimeout(() => {
-            resultElement.classList.remove('rolling');
-        }, 500);
-    }, spinDuration);
+        // Check if we've spun enough and velocity is low
+        const hasSpunEnough = totalRotation >= Math.abs(finalRotation) * 0.8;
+        
+        if (hasSpunEnough && velocity < minVelocity) {
+            // Snap to final position with smooth transition
+            wheel.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            
+            // Set final result after a brief delay
+            setTimeout(() => {
+                resultElement.textContent = targetItem;
+                resultElement.classList.add('rolling');
+                
+                // Remove spinning class
+                setTimeout(() => {
+                    wheel.classList.remove('spinning');
+                    resultElement.classList.remove('rolling');
+                    if (onComplete) onComplete();
+                }, 500);
+            }, 100);
+            
+            return;
+        }
+        
+        // Continue animation
+        requestAnimationFrame(animate);
+    }
+    
+    // Start animation
+    requestAnimationFrame(animate);
 }
+
+// Track active spins
+let activeSpins = 0;
 
 // Handle roll button click
 function handleRoll() {
     // Disable button during roll
     rollButton.disabled = true;
+    activeSpins = 2;
     
-    // Spin both wheels
-    spinWheel(letterWheel, letters, letterResult, 3000);
-    spinWheel(numberWheel, numbers, numberResult, 3200);
+    // Callback to re-enable button when spins complete
+    const onSpinComplete = () => {
+        activeSpins--;
+        if (activeSpins === 0) {
+            rollButton.disabled = false;
+        }
+    };
     
-    // Re-enable button after spin completes
-    setTimeout(() => {
-        rollButton.disabled = false;
-    }, 3200);
+    // Spin both wheels with callbacks
+    spinWheel(letterWheel, letters, letterResult, 3000, onSpinComplete);
+    spinWheel(numberWheel, numbers, numberResult, 3200, onSpinComplete);
 }
 
 // Add event listener to roll button
