@@ -18,6 +18,17 @@
     --spinner-radius: 200px;
 }
 
+/* Debug: Make containers visible temporarily */
+.spinner-container {
+    border: 2px solid red;
+    background: rgba(255, 0, 0, 0.1);
+}
+
+.spinner-circle {
+    border: 2px solid blue;
+    background: rgba(0, 0, 255, 0.1);
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, var(--pirate-dark-blue) 0%, var(--pirate-navy) 100%);
@@ -137,8 +148,10 @@ main {
     position: relative;
     height: var(--spinner-radius);
     width: var(--spinner-radius);
-    overflow: hidden;
+    overflow: visible; /* Temporarily visible for debugging */
     flex-shrink: 0;
+    border: 2px solid red; /* Debug border */
+    background: rgba(255, 0, 0, 0.1); /* Debug background */
 }
 
 .spinner-left-container {
@@ -155,6 +168,7 @@ main {
     background-color: #000;
     flex-shrink: 0;
     z-index: 10;
+    display: none; /* Temporarily hide to see if this is the orange rectangle */
 }
 
 .spinner-bottom-line {
@@ -165,6 +179,7 @@ main {
     height: 4px;
     background-color: #000;
     z-index: 10;
+    display: none; /* Temporarily hide to see if this is the orange rectangle */
 }
 
 .spinner-circle {
@@ -174,16 +189,18 @@ main {
     transform-origin: center center;
     will-change: transform;
     display: block;
+    border: 2px solid blue; /* Debug border */
+    background: rgba(0, 0, 255, 0.1); /* Debug background */
 }
 
 .spinner-left-container .spinner-circle {
     left: calc(-1 * var(--spinner-radius));
-    bottom: 0;
+    bottom: calc(-1 * var(--spinner-radius));
 }
 
 .spinner-right-container .spinner-circle {
     right: calc(-1 * var(--spinner-radius));
-    bottom: 0;
+    bottom: calc(-1 * var(--spinner-radius));
 }
 
 .spinner-svg {
@@ -193,6 +210,8 @@ main {
     transition: transform 0.1s linear;
     will-change: transform;
     display: block;
+    border: 2px solid green; /* Debug border */
+    background: rgba(0, 255, 0, 0.1); /* Debug background */
 }
 
 .spinner-svg.spinning {

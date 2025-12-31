@@ -13,6 +13,12 @@ window.addEventListener('orientationchange', () => {
     setTimeout(setViewportHeight, 100);
 });
 
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSpinners();
+});
+
+function initializeSpinners() {
 // Get DOM elements
 const letterResult = document.getElementById('letter-result');
 const numberResult = document.getElementById('number-result');
@@ -115,15 +121,24 @@ function createSpinnerContent(container, items) {
 }
 
 // Initialize spinners
-createSpinnerContent(letterContentGroup, letters);
-createSpinnerContent(numberContentGroup, numbers);
+console.log('Initializing spinners...');
+console.log('Letter content group:', letterContentGroup);
+console.log('Number content group:', numberContentGroup);
+
+if (!letterContentGroup || !numberContentGroup) {
+    console.error('Content groups not found!');
+} else {
+    createSpinnerContent(letterContentGroup, letters);
+    createSpinnerContent(numberContentGroup, numbers);
+    console.log('Spinner content created');
+}
 
 // Keep full viewBox - CSS will handle the clipping
 // The SVG will show the full circle, and CSS overflow will clip to show only the visible half
 
 // Set initial results
-letterResult.textContent = letters[0];
-numberResult.textContent = numbers[0];
+if (letterResult) letterResult.textContent = letters[0];
+if (numberResult) numberResult.textContent = numbers[0];
 
 // Spin wheel with realistic physics
 function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete = null, rotationState) {
@@ -259,4 +274,6 @@ document.addEventListener('keydown', (event) => {
         handleRoll();
     }
 });
+
+} // End of initializeSpinners function
 
