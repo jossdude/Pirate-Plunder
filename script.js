@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.14';
+const VERSION = '1.0.16';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -60,18 +60,15 @@ function createSpinnerContent(container, items) {
     const anglePerItem = 360 / items.length;
     const textRadius = SPINNER_RADIUS * 0.75;
     
-    // Create orange arc outline for visible semi-circle (curved top edge)
-    // Arc goes from left edge to right edge, curving upward (180 degree arc for top half)
-    const arcPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const leftX = SPINNER_CENTER_X - SPINNER_RADIUS;
-    const rightX = SPINNER_CENTER_X + SPINNER_RADIUS;
-    // Create arc from left to right, curving upward (large arc flag = 1 for 180 degrees)
-    arcPath.setAttribute('d', `M ${leftX} ${SPINNER_CENTER_Y} A ${SPINNER_RADIUS} ${SPINNER_RADIUS} 0 1 1 ${rightX} ${SPINNER_CENTER_Y}`);
-    arcPath.setAttribute('fill', 'none');
-    arcPath.setAttribute('stroke', '#ff8c00');
-    arcPath.setAttribute('stroke-width', '8');
-    arcPath.setAttribute('stroke-linecap', 'round');
-    container.appendChild(arcPath);
+    // Create full circle with fill color
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', SPINNER_CENTER_X);
+    circle.setAttribute('cy', SPINNER_CENTER_Y);
+    circle.setAttribute('r', SPINNER_RADIUS);
+    circle.setAttribute('fill', '#f5e6d3'); // Pirate cream color
+    circle.setAttribute('stroke', '#ff8c00'); // Orange border
+    circle.setAttribute('stroke-width', '8');
+    container.appendChild(circle);
     
     // Create orange radiating lines from center
     const numLines = 12;
