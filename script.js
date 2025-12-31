@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.16';
+const VERSION = '1.0.18';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -70,10 +70,9 @@ function createSpinnerContent(container, items) {
     circle.setAttribute('stroke-width', '8');
     container.appendChild(circle);
     
-    // Create orange radiating lines from center
-    const numLines = 12;
-    for (let i = 0; i < numLines; i++) {
-        const angle = (i * 360 / numLines) * (Math.PI / 180);
+    // Create orange radiating lines from center (one line per segment)
+    for (let i = 0; i < items.length; i++) {
+        const angle = (i * anglePerItem - 90) * (Math.PI / 180); // Start at top (-90 degrees)
         const lineLength = SPINNER_RADIUS * 0.9;
         const x1 = SPINNER_CENTER_X;
         const y1 = SPINNER_CENTER_Y;
@@ -91,9 +90,10 @@ function createSpinnerContent(container, items) {
         container.appendChild(line);
     }
     
-    // Create items (letters/numbers) positioned around the circle
+    // Create items (letters/numbers) positioned in the center of each segment
     items.forEach((item, index) => {
-        const angle = (index * anglePerItem - 90) * (Math.PI / 180); // Start at top (-90 degrees)
+        // Position at center of segment: index * anglePerItem + anglePerItem/2 - 90
+        const angle = (index * anglePerItem + anglePerItem / 2 - 90) * (Math.PI / 180);
         const textX = SPINNER_CENTER_X + textRadius * Math.cos(angle);
         const textY = SPINNER_CENTER_Y + textRadius * Math.sin(angle);
         
@@ -127,12 +127,23 @@ if (!letterContentGroup || !numberContentGroup) {
 
 // Keep full viewBox - CSS will handle the clipping to show half of each spinner
 
-// Set initial results
-if (letterResult) letterResult.textContent = letters[0];
-if (numberResult) numberResult.textContent = numbers[0];
+// Helper function to calculate which item is at a pointer position
+function getItemAtPointer(items, rotation, pointerAngle) {
+    const anglePerItem = 360 / items.length;
+    const normalizedRotation = ((rotation % 360) + 360) % 360;
+    const adjustedAngle = (pointerAngle - normalizedRotation + 360) % 360;
+    const currentIndex = Math.floor(adjustedAngle / anglePerItem) % items.length;
+    return items[currentIndex];
+}
+
+// Set initial results based on pointer positions
+// Left spinner: pointer at right side (0 degrees)
+// Right spinner: pointer at left side (180 degrees)
+if (letterResult) letterResult.textContent = getItemAtPointer(letters, 0, 0);
+if (numberResult) numberResult.textContent = getItemAtPointer(numbers, 0, 180);
 
 // Spin wheel with realistic physics
-function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete = null, rotationState) {
+function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete = null, rotationState, pointerAngle = -90) {
     // Generate random target using secure randomness
     const targetIndex = getSecureRandom(items.length);
     const targetItem = items[targetIndex];
@@ -140,11 +151,13 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
     // Calculate angle per item
     const anglePerItem = 360 / items.length;
     
-    // Pointer is at top-center (0 degrees / -90 degrees from SVG coordinate system)
-    // Each item starts at index * anglePerItem - 90 degrees
-    // We want the center of the target item to align with the pointer (top-center)
+    // Pointer angle is passed as parameter (default -90 for top-center)
+    // Left spinner: 0 degrees (right side)
+    // Right spinner: 180 degrees (left side)
+    // Each item is centered at index * anglePerItem + anglePerItem/2 - 90 degrees
+    // We want the center of the target item to align with the pointer
     const itemCenterAngle = targetIndex * anglePerItem + anglePerItem / 2 - 90;
-    const targetAngle = -itemCenterAngle;
+    const targetAngle = pointerAngle - itemCenterAngle;
     
     // Add multiple full rotations for visual effect (using secure randomness)
     const extraRotations = 5 + getSecureRandom(3); // 5-7 full rotations
@@ -186,15 +199,8 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
         wheel.style.transform = `rotate(${rotation}deg)`;
         rotationState.value = rotation; // Update tracked rotation
         
-        // Calculate which item is at the top-center position
-        // Top-center is at 0 degrees (or -90 degrees in SVG coordinates)
-        const normalizedRotation = ((rotation % 360) + 360) % 360;
-        // Adjust for SVG coordinate system (top is -90 degrees)
-        const pointerAngle = -90; // Top-center position
-        const adjustedAngle = (pointerAngle - normalizedRotation + 360) % 360;
-        const currentIndex = Math.floor(adjustedAngle / anglePerItem) % items.length;
-        
-        resultElement.textContent = items[currentIndex];
+        // Calculate which item is at the pointer position
+        resultElement.textContent = getItemAtPointer(items, rotation, pointerAngle);
         
         // Check if we should stop - need minimum duration AND spin enough AND be slow enough
         const minSpinDistance = Math.abs(finalRotation) * 0.6; // At least 60% of target rotation
@@ -251,8 +257,10 @@ function handleRoll() {
     };
     
     // Spin both wheels with callbacks and rotation state
-    spinWheel(letterWheel, letters, letterResult, 3000, onSpinComplete, letterWheelRotation);
-    spinWheel(numberWheel, numbers, numberResult, 3200, onSpinComplete, numberWheelRotation);
+    // Left spinner: pointer at right side (0 degrees in SVG coordinates)
+    // Right spinner: pointer at left side (180 degrees in SVG coordinates)
+    spinWheel(letterWheel, letters, letterResult, 3000, onSpinComplete, letterWheelRotation, 0);
+    spinWheel(numberWheel, numbers, numberResult, 3200, onSpinComplete, numberWheelRotation, 180);
 }
 
 // Add event listener to roll button
