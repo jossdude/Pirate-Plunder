@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.18';
+const VERSION = '1.0.20';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -169,9 +169,9 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
     
     // Physics parameters for realistic spinner
     const startVelocity = 10 + getSecureRandom(8); // Initial angular velocity (degrees per frame)
-    const friction = 0.98; // Friction coefficient (slows down over time)
-    const minVelocity = 0.25; // Minimum velocity before snapping to target
-    const minDuration = 2000; // Minimum spin duration in milliseconds
+    const friction = 0.96; // Friction coefficient (slows down over time) - increased for quicker slowdown
+    const minVelocity = 0.5; // Minimum velocity before snapping to target - increased to stop sooner
+    const minDuration = 1500; // Minimum spin duration in milliseconds - reduced for quicker animation
     
     let velocity = startVelocity;
     let rotation = startRotation;
@@ -210,23 +210,21 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
         const shouldStop = hasMinDuration && hasSpunEnough && isSlowEnough;
         
         if (shouldStop || frameCount > 600) { // Safety limit
-            // Snap to final position with smooth transition
-            wheel.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            // Set the final result immediately to prevent any visual jump
+            resultElement.textContent = targetItem;
+            resultElement.classList.add('rolling');
+            
+            // Smoothly snap to exact target position for precision (very quick transition)
+            wheel.style.transition = 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             wheel.style.transform = `rotate(${targetRotation}deg)`;
             rotationState.value = targetRotation; // Update tracked rotation
             
-            // Set final result after transition
+            // Remove spinning class after brief transition
             setTimeout(() => {
-                resultElement.textContent = targetItem;
-                resultElement.classList.add('rolling');
-                
-                // Remove spinning class
-                setTimeout(() => {
-                    wheel.classList.remove('spinning');
-                    resultElement.classList.remove('rolling');
-                    if (onComplete) onComplete();
-                }, 500);
-            }, 500);
+                wheel.classList.remove('spinning');
+                resultElement.classList.remove('rolling');
+                if (onComplete) onComplete();
+            }, 200);
             
             return;
         }

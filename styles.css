@@ -125,7 +125,7 @@ main {
     align-items: center;
     justify-content: center;
     gap: 20px;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
     flex-shrink: 0;
     position: relative;
     width: 100vw;
@@ -196,9 +196,7 @@ main {
 
 .result-display {
     position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: calc(50% - 80px);
     font-size: 2.5rem;
     font-weight: bold;
     color: var(--pirate-gold);
@@ -228,6 +226,11 @@ main {
     border-right: 30px solid #000;
 }
 
+.spinner-left-container .result-display {
+    right: -15px;
+    transform: translateX(50%);
+}
+
 .spinner-right-container .spinner-pointer {
     top: 50%;
     left: -15px;
@@ -237,13 +240,36 @@ main {
     border-left: 30px solid #000;
 }
 
+.spinner-right-container .result-display {
+    left: -15px;
+    transform: translateX(-50%);
+}
+
 .result-display.rolling {
     animation: pulseAnimation 0.5s ease-in-out;
 }
 
 @keyframes pulseAnimation {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.2); }
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.spinner-left-container .result-display.rolling {
+    animation: pulseAnimationLeft 0.5s ease-in-out;
+}
+
+.spinner-right-container .result-display.rolling {
+    animation: pulseAnimationRight 0.5s ease-in-out;
+}
+
+@keyframes pulseAnimationLeft {
+    0%, 100% { transform: translateX(50%) scale(1); }
+    50% { transform: translateX(50%) scale(1.2); }
+}
+
+@keyframes pulseAnimationRight {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.2); }
 }
 
 .label {
@@ -346,7 +372,7 @@ footer {
     
     .result-display {
         font-size: 1.8rem;
-        top: -40px;
+        top: calc(50% - 70px);
     }
     
     .spinner-left-container .spinner-pointer {
@@ -420,7 +446,7 @@ footer {
     
     .result-display {
         font-size: 1.4rem;
-        top: -35px;
+        top: calc(50% - 60px);
     }
     
     .spinner-left-container .spinner-pointer {
