@@ -18,16 +18,30 @@ const letterResult = document.getElementById('letter-result');
 const numberResult = document.getElementById('number-result');
 const rollButton = document.getElementById('roll-button');
 
-// Generate random letter from A to L
+// Generate cryptographically secure random number in range [0, max)
+function getSecureRandom(max) {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    // Use modulo to get value in range, but handle modulo bias
+    const maxValid = Math.floor(4294967296 / max) * max;
+    let value = array[0];
+    while (value >= maxValid) {
+        crypto.getRandomValues(array);
+        value = array[0];
+    }
+    return value % max;
+}
+
+// Generate random letter from A to L using secure randomness
 function getRandomLetter() {
     const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
-    const randomIndex = Math.floor(Math.random() * letters.length);
+    const randomIndex = getSecureRandom(letters.length);
     return letters[randomIndex];
 }
 
-// Generate random number from 1 to 18
+// Generate random number from 1 to 18 using secure randomness
 function getRandomNumber() {
-    return Math.floor(Math.random() * 18) + 1;
+    return getSecureRandom(18) + 1;
 }
 
 // Add rolling animation class
