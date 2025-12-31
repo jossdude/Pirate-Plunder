@@ -20,19 +20,35 @@
             <div class="randomizers">
                 <div class="randomizer-box">
                     <h2>Letter Roll</h2>
-                    <div class="result-display" id="letter-result">-</div>
+                    <div class="wheel-container">
+                        <svg class="wheel" id="letter-wheel" viewBox="0 0 300 300">
+                            <circle cx="150" cy="150" r="140" fill="none" stroke="var(--pirate-gold)" stroke-width="2"/>
+                            <g id="letter-wheel-segments"></g>
+                            <circle cx="150" cy="150" r="20" fill="var(--pirate-dark-blue)" stroke="var(--pirate-gold)" stroke-width="3"/>
+                        </svg>
+                        <div class="wheel-pointer"></div>
+                        <div class="result-display" id="letter-result">-</div>
+                    </div>
                     <p class="label">A to L</p>
                 </div>
                 
                 <div class="randomizer-box">
                     <h2>Number Roll</h2>
-                    <div class="result-display" id="number-result">-</div>
+                    <div class="wheel-container">
+                        <svg class="wheel" id="number-wheel" viewBox="0 0 300 300">
+                            <circle cx="150" cy="150" r="140" fill="none" stroke="var(--pirate-gold)" stroke-width="2"/>
+                            <g id="number-wheel-segments"></g>
+                            <circle cx="150" cy="150" r="20" fill="var(--pirate-dark-blue)" stroke="var(--pirate-gold)" stroke-width="3"/>
+                        </svg>
+                        <div class="wheel-pointer"></div>
+                        <div class="result-display" id="number-result">-</div>
+                    </div>
                     <p class="label">1 to 18</p>
                 </div>
             </div>
             
             <button class="roll-button" id="roll-button">
-                <span class="button-text">Roll the Dice!</span>
+                <span class="button-text">Spin the Spinners!</span>
                 <span class="button-icon">🎲</span>
             </button>
         </main>
