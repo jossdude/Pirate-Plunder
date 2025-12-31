@@ -13,13 +13,7 @@ window.addEventListener('orientationchange', () => {
     setTimeout(setViewportHeight, 100);
 });
 
-// Wait for DOM to be ready
-document.addEventListener('DOMContentLoaded', function() {
-    initializeSpinners();
-});
-
-function initializeSpinners() {
-// Get DOM elements
+// Get DOM elements - script is at end of body so DOM is ready
 const letterResult = document.getElementById('letter-result');
 const numberResult = document.getElementById('number-result');
 const rollButton = document.getElementById('roll-button');
@@ -27,6 +21,13 @@ const letterWheel = document.getElementById('letter-wheel');
 const numberWheel = document.getElementById('number-wheel');
 const letterContentGroup = document.getElementById('letter-wheel-content');
 const numberContentGroup = document.getElementById('number-wheel-content');
+
+// Debug: Check if elements exist
+console.log('Elements check:');
+console.log('letterResult:', letterResult);
+console.log('letterWheel:', letterWheel);
+console.log('letterContentGroup:', letterContentGroup);
+console.log('numberContentGroup:', numberContentGroup);
 
 // Track wheel rotation states (using objects so they're passed by reference)
 const letterWheelRotation = { value: 0 };
@@ -127,10 +128,13 @@ console.log('Number content group:', numberContentGroup);
 
 if (!letterContentGroup || !numberContentGroup) {
     console.error('Content groups not found!');
+    alert('ERROR: Content groups not found! Check console for details.');
 } else {
     createSpinnerContent(letterContentGroup, letters);
     createSpinnerContent(numberContentGroup, numbers);
     console.log('Spinner content created');
+    console.log('Letter content children:', letterContentGroup.children.length);
+    console.log('Number content children:', numberContentGroup.children.length);
 }
 
 // Keep full viewBox - CSS will handle the clipping
@@ -274,6 +278,4 @@ document.addEventListener('keydown', (event) => {
         handleRoll();
     }
 });
-
-} // End of initializeSpinners function
 

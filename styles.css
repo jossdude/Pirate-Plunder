@@ -148,10 +148,12 @@ main {
     position: relative;
     height: var(--spinner-radius);
     width: var(--spinner-radius);
-    overflow: visible; /* Temporarily visible for debugging */
+    overflow: hidden;
     flex-shrink: 0;
     border: 2px solid red; /* Debug border */
-    background: rgba(255, 0, 0, 0.1); /* Debug background */
+    background: rgba(255, 0, 0, 0.2); /* Debug background - make it more visible */
+    min-height: 200px;
+    min-width: 200px;
 }
 
 .spinner-left-container {
@@ -168,7 +170,6 @@ main {
     background-color: #000;
     flex-shrink: 0;
     z-index: 10;
-    display: none; /* Temporarily hide to see if this is the orange rectangle */
 }
 
 .spinner-bottom-line {
@@ -179,7 +180,6 @@ main {
     height: 4px;
     background-color: #000;
     z-index: 10;
-    display: none; /* Temporarily hide to see if this is the orange rectangle */
 }
 
 .spinner-circle {
@@ -190,7 +190,9 @@ main {
     will-change: transform;
     display: block;
     border: 2px solid blue; /* Debug border */
-    background: rgba(0, 0, 255, 0.1); /* Debug background */
+    background: rgba(0, 0, 255, 0.2); /* Debug background - make it more visible */
+    min-width: 400px;
+    min-height: 400px;
 }
 
 .spinner-left-container .spinner-circle {
@@ -211,7 +213,7 @@ main {
     will-change: transform;
     display: block;
     border: 2px solid green; /* Debug border */
-    background: rgba(0, 255, 0, 0.1); /* Debug background */
+    background: rgba(0, 255, 0, 0.2); /* Debug background - make it more visible */
 }
 
 .spinner-svg.spinning {
