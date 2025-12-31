@@ -19,12 +19,21 @@ const numberResult = document.getElementById('number-result');
 const rollButton = document.getElementById('roll-button');
 const letterWheel = document.getElementById('letter-wheel');
 const numberWheel = document.getElementById('number-wheel');
-const letterSegmentsGroup = document.getElementById('letter-wheel-segments');
-const numberSegmentsGroup = document.getElementById('number-wheel-segments');
+const letterContentGroup = document.getElementById('letter-wheel-content');
+const numberContentGroup = document.getElementById('number-wheel-content');
+
+// Track wheel rotation states (using objects so they're passed by reference)
+const letterWheelRotation = { value: 0 };
+const numberWheelRotation = { value: 0 };
 
 // Wheel data
 const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
 const numbers = Array.from({length: 18}, (_, i) => i + 1);
+
+// Spinner dimensions
+const SPINNER_CENTER_X = 300;
+const SPINNER_CENTER_Y = 300;
+const SPINNER_RADIUS = 250;
 
 // Generate cryptographically secure random number in range [0, max)
 function getSecureRandom(max) {
@@ -40,148 +49,158 @@ function getSecureRandom(max) {
     return value % max;
 }
 
-// Create wheel segments
-function createWheelSegments(container, items, colors) {
-    const centerX = 150;
-    const centerY = 150;
-    const radius = 140;
-    const anglePerSegment = 360 / items.length;
+// Create spinner content with letters/numbers and radiating lines
+function createSpinnerContent(container, items) {
+    const anglePerItem = 360 / items.length;
+    const textRadius = SPINNER_RADIUS * 0.75;
     
+    // Create orange arc outline for visible semi-circle (curved top edge)
+    // Arc goes from left edge to right edge, curving upward (180 degree arc for top half)
+    const arcPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const leftX = SPINNER_CENTER_X - SPINNER_RADIUS;
+    const rightX = SPINNER_CENTER_X + SPINNER_RADIUS;
+    // Create arc from left to right, curving upward (large arc flag = 1 for 180 degrees)
+    arcPath.setAttribute('d', `M ${leftX} ${SPINNER_CENTER_Y} A ${SPINNER_RADIUS} ${SPINNER_RADIUS} 0 1 1 ${rightX} ${SPINNER_CENTER_Y}`);
+    arcPath.setAttribute('fill', 'none');
+    arcPath.setAttribute('stroke', '#ff8c00');
+    arcPath.setAttribute('stroke-width', '8');
+    arcPath.setAttribute('stroke-linecap', 'round');
+    container.appendChild(arcPath);
+    
+    // Create orange radiating lines from center
+    const numLines = 12;
+    for (let i = 0; i < numLines; i++) {
+        const angle = (i * 360 / numLines) * (Math.PI / 180);
+        const lineLength = SPINNER_RADIUS * 0.9;
+        const x1 = SPINNER_CENTER_X;
+        const y1 = SPINNER_CENTER_Y;
+        const x2 = SPINNER_CENTER_X + lineLength * Math.cos(angle);
+        const y2 = SPINNER_CENTER_Y + lineLength * Math.sin(angle);
+        
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', '#ff8c00');
+        line.setAttribute('stroke-width', '2');
+        line.setAttribute('stroke-linecap', 'round');
+        container.appendChild(line);
+    }
+    
+    // Create items (letters/numbers) positioned around the circle
     items.forEach((item, index) => {
-        const startAngle = (index * anglePerSegment - 90) * (Math.PI / 180);
-        const endAngle = ((index + 1) * anglePerSegment - 90) * (Math.PI / 180);
+        const angle = (index * anglePerItem - 90) * (Math.PI / 180); // Start at top (-90 degrees)
+        const textX = SPINNER_CENTER_X + textRadius * Math.cos(angle);
+        const textY = SPINNER_CENTER_Y + textRadius * Math.sin(angle);
         
-        // Create path for segment
-        const x1 = centerX + radius * Math.cos(startAngle);
-        const y1 = centerY + radius * Math.sin(startAngle);
-        const x2 = centerX + radius * Math.cos(endAngle);
-        const y2 = centerY + radius * Math.sin(endAngle);
-        
-        const largeArcFlag = anglePerSegment > 180 ? 1 : 0;
-        
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`);
-        path.setAttribute('fill', colors[index % colors.length]);
-        path.setAttribute('stroke', 'var(--pirate-dark-blue)');
-        path.setAttribute('stroke-width', '1');
-        
-        // Add text label with proper rotation
-        const midAngle = (startAngle + endAngle) / 2;
-        const textRadius = radius * 0.7;
-        const textX = centerX + textRadius * Math.cos(midAngle);
-        const textY = centerY + textRadius * Math.sin(midAngle);
-        const textRotation = (midAngle * 180 / Math.PI) + 90;
+        // Calculate rotation so text is readable (perpendicular to radius)
+        const textRotation = (angle * 180 / Math.PI) + 90;
         
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', textX);
         text.setAttribute('y', textY);
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('fill', 'var(--pirate-cream)');
-        text.setAttribute('font-size', items.length <= 12 ? '18' : '14');
+        text.setAttribute('fill', '#000');
+        text.setAttribute('font-size', items.length <= 12 ? '32' : '24');
         text.setAttribute('font-weight', 'bold');
         text.setAttribute('transform', `rotate(${textRotation} ${textX} ${textY})`);
         text.textContent = item;
+        text.setAttribute('class', 'spinner-item');
+        text.setAttribute('data-index', index);
         
-        container.appendChild(path);
         container.appendChild(text);
     });
 }
 
-// Initialize wheels
-const letterColors = [
-    'rgba(212, 175, 55, 0.3)',
-    'rgba(139, 69, 19, 0.3)',
-    'rgba(212, 175, 55, 0.4)',
-    'rgba(139, 69, 19, 0.4)'
-];
+// Initialize spinners
+createSpinnerContent(letterContentGroup, letters);
+createSpinnerContent(numberContentGroup, numbers);
 
-const numberColors = [
-    'rgba(212, 175, 55, 0.3)',
-    'rgba(139, 69, 19, 0.3)',
-    'rgba(212, 175, 55, 0.4)',
-    'rgba(139, 69, 19, 0.4)',
-    'rgba(212, 175, 55, 0.35)',
-    'rgba(139, 69, 19, 0.35)'
-];
-
-createWheelSegments(letterSegmentsGroup, letters, letterColors);
-createWheelSegments(numberSegmentsGroup, numbers, numberColors);
+// Set initial results
+letterResult.textContent = letters[0];
+numberResult.textContent = numbers[0];
 
 // Spin wheel with realistic physics
-function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete = null) {
+function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete = null, rotationState) {
     // Generate random target using secure randomness
     const targetIndex = getSecureRandom(items.length);
     const targetItem = items[targetIndex];
     
-    // Calculate angle per segment
-    const anglePerSegment = 360 / items.length;
+    // Calculate angle per item
+    const anglePerItem = 360 / items.length;
     
-    // Pointer is at top (0 degrees / -90 degrees from SVG coordinate system)
-    // Each segment starts at index * anglePerSegment - 90 degrees
-    // We want the center of the target segment to align with the pointer (top)
-    const segmentCenterAngle = targetIndex * anglePerSegment + anglePerSegment / 2 - 90;
-    const targetAngle = -segmentCenterAngle;
+    // Pointer is at top-center (0 degrees / -90 degrees from SVG coordinate system)
+    // Each item starts at index * anglePerItem - 90 degrees
+    // We want the center of the target item to align with the pointer (top-center)
+    const itemCenterAngle = targetIndex * anglePerItem + anglePerItem / 2 - 90;
+    const targetAngle = -itemCenterAngle;
     
     // Add multiple full rotations for visual effect (using secure randomness)
     const extraRotations = 5 + getSecureRandom(3); // 5-7 full rotations
     const finalRotation = extraRotations * 360 + targetAngle;
     
-    // Get current rotation (handle initial state)
-    const currentTransform = wheel.style.transform || 'rotate(0deg)';
-    let currentRotation = parseFloat(currentTransform.match(/-?\d+\.?\d*/)?.[0] || 0);
-    
-    // Normalize current rotation to 0-360 range
-    currentRotation = ((currentRotation % 360) + 360) % 360;
-    const targetRotation = currentRotation + finalRotation;
+    // Use tracked rotation state
+    const startRotation = rotationState.value;
+    const targetRotation = startRotation + finalRotation;
     
     // Physics parameters for realistic spinner
-    const startVelocity = 15 + getSecureRandom(10); // Initial angular velocity (degrees per frame) - varies for realism
-    const friction = 0.985; // Friction coefficient (slows down over time)
-    const minVelocity = 0.15; // Minimum velocity before snapping to target
+    const startVelocity = 10 + getSecureRandom(8); // Initial angular velocity (degrees per frame)
+    const friction = 0.98; // Friction coefficient (slows down over time)
+    const minVelocity = 0.25; // Minimum velocity before snapping to target
+    const minDuration = 2000; // Minimum spin duration in milliseconds
     
     let velocity = startVelocity;
-    let rotation = currentRotation;
+    let rotation = startRotation;
     let totalRotation = 0;
-    let isDecelerating = false;
+    let frameCount = 0;
+    const startTime = Date.now();
     
     wheel.classList.add('spinning');
     wheel.style.transition = 'none'; // Remove CSS transition for manual control
+    wheel.style.transform = `rotate(${rotation}deg)`;
     
     // Animation loop with realistic physics
     function animate() {
+        frameCount++;
+        const elapsed = Date.now() - startTime;
+        
         // Apply velocity
         rotation += velocity;
         totalRotation += Math.abs(velocity);
         
-        // Apply friction (deceleration) - more aggressive as it slows
-        if (velocity > 1) {
-            velocity *= friction;
-        } else {
-            // More aggressive deceleration when slow
-            velocity *= 0.95;
-        }
+        // Apply friction (deceleration)
+        velocity *= friction;
         
         // Update wheel rotation
         wheel.style.transform = `rotate(${rotation}deg)`;
+        rotationState.value = rotation; // Update tracked rotation
         
-        // Calculate which segment is under the pointer
+        // Calculate which item is at the top-center position
+        // Top-center is at 0 degrees (or -90 degrees in SVG coordinates)
         const normalizedRotation = ((rotation % 360) + 360) % 360;
-        const pointerAngle = 90; // Pointer is at top (90 degrees in SVG coordinates)
+        // Adjust for SVG coordinate system (top is -90 degrees)
+        const pointerAngle = -90; // Top-center position
         const adjustedAngle = (pointerAngle - normalizedRotation + 360) % 360;
-        const currentIndex = Math.floor(adjustedAngle / anglePerSegment) % items.length;
+        const currentIndex = Math.floor(adjustedAngle / anglePerItem) % items.length;
         
         resultElement.textContent = items[currentIndex];
         
-        // Check if we've spun enough and velocity is low
-        const hasSpunEnough = totalRotation >= Math.abs(finalRotation) * 0.8;
+        // Check if we should stop - need minimum duration AND spin enough AND be slow enough
+        const minSpinDistance = Math.abs(finalRotation) * 0.6; // At least 60% of target rotation
+        const hasMinDuration = elapsed >= minDuration;
+        const hasSpunEnough = totalRotation >= minSpinDistance;
+        const isSlowEnough = velocity < minVelocity;
+        const shouldStop = hasMinDuration && hasSpunEnough && isSlowEnough;
         
-        if (hasSpunEnough && velocity < minVelocity) {
+        if (shouldStop || frameCount > 600) { // Safety limit
             // Snap to final position with smooth transition
-            wheel.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            wheel.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             wheel.style.transform = `rotate(${targetRotation}deg)`;
+            rotationState.value = targetRotation; // Update tracked rotation
             
-            // Set final result after a brief delay
+            // Set final result after transition
             setTimeout(() => {
                 resultElement.textContent = targetItem;
                 resultElement.classList.add('rolling');
@@ -192,7 +211,7 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
                     resultElement.classList.remove('rolling');
                     if (onComplete) onComplete();
                 }, 500);
-            }, 100);
+            }, 500);
             
             return;
         }
@@ -222,9 +241,9 @@ function handleRoll() {
         }
     };
     
-    // Spin both wheels with callbacks
-    spinWheel(letterWheel, letters, letterResult, 3000, onSpinComplete);
-    spinWheel(numberWheel, numbers, numberResult, 3200, onSpinComplete);
+    // Spin both wheels with callbacks and rotation state
+    spinWheel(letterWheel, letters, letterResult, 3000, onSpinComplete, letterWheelRotation);
+    spinWheel(numberWheel, numbers, numberResult, 3200, onSpinComplete, numberWheelRotation);
 }
 
 // Add event listener to roll button
