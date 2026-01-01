@@ -24,6 +24,10 @@
     --gold-bronze: #8b4513;
 }
 
+html {
+    background: linear-gradient(to bottom, var(--pirate-navy) 0%, var(--pirate-dark-blue) 100%);
+    height: 100%;
+}
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -218,12 +222,12 @@ main {
 }
 
 .spinner-left-container .result-display {
-    right: -87px;
+    right: -93px;
     transform: translateY(calc(-50% - 3px));
 }
 
 .spinner-right-container .result-display {
-    left: -139px;
+    left: -149px;
     transform: translateY(calc(-50% - 3px));
     text-align: right;
 }
@@ -369,12 +373,12 @@ footer {
     }
     
     .spinner-left-container .result-display {
-        right: -78px;
+        right: -84px;
         transform: translateY(calc(-50% - 3px));
     }
     
     .spinner-right-container .result-display {
-        left: -121px;
+        left: -130px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
@@ -441,12 +445,12 @@ footer {
     }
     
     .spinner-left-container .result-display {
-        right: -73px;
+        right: -79px;
         transform: translateY(calc(-50% - 3px));
     }
     
     .spinner-right-container .result-display {
-        left: -116px;
+        left: -125px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
