@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.35';
+const VERSION = '1.36';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -113,16 +113,16 @@ function createSpinnerContent(container, items) {
     const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
     pattern.setAttribute('id', patternId);
     pattern.setAttribute('patternUnits', 'userSpaceOnUse');
-    pattern.setAttribute('width', '40');
-    pattern.setAttribute('height', '40');
+    pattern.setAttribute('width', '200');
+    pattern.setAttribute('height', '200');
     
     // Create aged texture with multiple layers
     // Layer 1: Fine grain noise (pitting/oxidation)
     for (let i = 0; i < 30; i++) {
         const noiseCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        const x = Math.random() * 40;
-        const y = Math.random() * 40;
-        const r = Math.random() * 0.6 + 0.1;
+        const x = Math.random() * 200;
+        const y = Math.random() * 200;
+        const r = Math.random() * 3 + 0.5;
         const opacity = Math.random() * 0.2 + 0.1;
         noiseCircle.setAttribute('cx', x);
         noiseCircle.setAttribute('cy', y);
@@ -135,9 +135,9 @@ function createSpinnerContent(container, items) {
     // Layer 2: Scratches and wear lines
     for (let i = 0; i < 8; i++) {
         const scratch = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        const x1 = Math.random() * 40;
-        const y1 = Math.random() * 40;
-        const length = Math.random() * 15 + 5;
+        const x1 = Math.random() * 200;
+        const y1 = Math.random() * 200;
+        const length = Math.random() * 75 + 25;
         const angle = Math.random() * Math.PI * 2;
         const x2 = x1 + Math.cos(angle) * length;
         const y2 = y1 + Math.sin(angle) * length;
@@ -146,7 +146,7 @@ function createSpinnerContent(container, items) {
         scratch.setAttribute('x2', x2);
         scratch.setAttribute('y2', y2);
         scratch.setAttribute('stroke', '#3d2817');
-        scratch.setAttribute('stroke-width', Math.random() * 0.5 + 0.3);
+        scratch.setAttribute('stroke-width', Math.random() * 2.5 + 1.5);
         scratch.setAttribute('opacity', Math.random() * 0.3 + 0.2);
         scratch.setAttribute('stroke-linecap', 'round');
         pattern.appendChild(scratch);
@@ -155,10 +155,10 @@ function createSpinnerContent(container, items) {
     // Layer 3: Patina spots (darker oxidation areas)
     for (let i = 0; i < 5; i++) {
         const patina = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
-        const cx = Math.random() * 40;
-        const cy = Math.random() * 40;
-        const rx = Math.random() * 3 + 1;
-        const ry = Math.random() * 3 + 1;
+        const cx = Math.random() * 200;
+        const cy = Math.random() * 200;
+        const rx = Math.random() * 15 + 5;
+        const ry = Math.random() * 15 + 5;
         patina.setAttribute('cx', cx);
         patina.setAttribute('cy', cy);
         patina.setAttribute('rx', rx);
