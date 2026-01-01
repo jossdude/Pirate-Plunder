@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.31';
+const VERSION = '1.0.32';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -39,7 +39,7 @@ const numbers = Array.from({length: 18}, (_, i) => i + 1);
 // Spinner dimensions
 const SPINNER_CENTER_X = 375;
 const SPINNER_CENTER_Y = 375;
-const SPINNER_RADIUS = 375;
+const SPINNER_RADIUS = 325;
 
 // Generate cryptographically secure random number in range [0, max)
 function getSecureRandom(max) {
@@ -60,17 +60,99 @@ function createSpinnerContent(container, items) {
     const anglePerItem = 360 / items.length;
     const textRadius = SPINNER_RADIUS * 0.75;
     
-    // Create full circle with fill color
+    // Get SVG element (parent of container)
+    const svgElement = container.ownerSVGElement || container.parentNode;
+    
+    // Create defs element for gradients and patterns if it doesn't exist
+    let defs = svgElement.querySelector('defs');
+    if (!defs) {
+        defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        svgElement.insertBefore(defs, svgElement.firstChild);
+    }
+    
+    // Create unique IDs for this spinner
+    const spinnerId = container.id || (container === letterContentGroup ? 'letter' : 'number');
+    const gradientId = `goldGradient-${spinnerId}`;
+    const patternId = `goldPattern-${spinnerId}`;
+    
+    // Create radial gradient for aged gold effect
+    const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+    gradient.setAttribute('id', gradientId);
+    gradient.setAttribute('cx', '50%');
+    gradient.setAttribute('cy', '50%');
+    gradient.setAttribute('r', '70%');
+    
+    // Add gradient stops for aged gold look
+    const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop1.setAttribute('offset', '0%');
+    stop1.setAttribute('stop-color', '#ffd700'); // Light gold center
+    stop1.setAttribute('stop-opacity', '1');
+    gradient.appendChild(stop1);
+    
+    const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop2.setAttribute('offset', '50%');
+    stop2.setAttribute('stop-color', '#cd853f'); // Medium gold
+    stop2.setAttribute('stop-opacity', '1');
+    gradient.appendChild(stop2);
+    
+    const stop3 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop3.setAttribute('offset', '85%');
+    stop3.setAttribute('stop-color', '#8b6914'); // Dark gold
+    stop3.setAttribute('stop-opacity', '1');
+    gradient.appendChild(stop3);
+    
+    const stop4 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+    stop4.setAttribute('offset', '100%');
+    stop4.setAttribute('stop-color', '#654321'); // Darkest gold/bronze edge
+    stop4.setAttribute('stop-opacity', '1');
+    gradient.appendChild(stop4);
+    
+    defs.appendChild(gradient);
+    
+    // Create texture pattern for weathered look
+    const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+    pattern.setAttribute('id', patternId);
+    pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+    pattern.setAttribute('width', '20');
+    pattern.setAttribute('height', '20');
+    
+    // Create subtle noise/texture using small circles
+    for (let i = 0; i < 15; i++) {
+        const noiseCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const x = Math.random() * 20;
+        const y = Math.random() * 20;
+        const r = Math.random() * 0.8 + 0.2;
+        const opacity = Math.random() * 0.15 + 0.05;
+        noiseCircle.setAttribute('cx', x);
+        noiseCircle.setAttribute('cy', y);
+        noiseCircle.setAttribute('r', r);
+        noiseCircle.setAttribute('fill', '#654321');
+        noiseCircle.setAttribute('opacity', opacity);
+        pattern.appendChild(noiseCircle);
+    }
+    
+    defs.appendChild(pattern);
+    
+    // Create full circle with gold gradient fill
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', SPINNER_CENTER_X);
     circle.setAttribute('cy', SPINNER_CENTER_Y);
     circle.setAttribute('r', SPINNER_RADIUS);
-    circle.setAttribute('fill', '#f5e6d3'); // Pirate cream color
-    circle.setAttribute('stroke', '#ff8c00'); // Orange border
+    circle.setAttribute('fill', `url(#${gradientId})`);
+    circle.setAttribute('stroke', '#654321'); // Dark bronze border
     circle.setAttribute('stroke-width', '8');
     container.appendChild(circle);
     
-    // Create orange radiating lines from center (one line per segment)
+    // Add texture overlay circle (matches the base circle exactly)
+    const textureCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    textureCircle.setAttribute('cx', SPINNER_CENTER_X);
+    textureCircle.setAttribute('cy', SPINNER_CENTER_Y);
+    textureCircle.setAttribute('r', SPINNER_RADIUS);
+    textureCircle.setAttribute('fill', `url(#${patternId})`);
+    textureCircle.setAttribute('opacity', '0.25');
+    container.appendChild(textureCircle);
+    
+    // Create gold/bronze radiating lines from center (one line per segment)
     for (let i = 0; i < items.length; i++) {
         const angle = (i * anglePerItem - 90) * (Math.PI / 180); // Start at top (-90 degrees)
         const lineLength = SPINNER_RADIUS * 0.9;
@@ -84,9 +166,10 @@ function createSpinnerContent(container, items) {
         line.setAttribute('y1', y1);
         line.setAttribute('x2', x2);
         line.setAttribute('y2', y2);
-        line.setAttribute('stroke', '#ff8c00');
+        line.setAttribute('stroke', '#8b6914'); // Dark gold/bronze
         line.setAttribute('stroke-width', '2');
         line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('opacity', '0.7');
         container.appendChild(line);
     }
     
@@ -105,9 +188,13 @@ function createSpinnerContent(container, items) {
         text.setAttribute('y', textY);
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('fill', '#000');
+        text.setAttribute('fill', '#1a1a1a'); // Dark text for contrast
         text.setAttribute('font-size', items.length <= 12 ? '32' : '24');
         text.setAttribute('font-weight', 'bold');
+        text.setAttribute('stroke', '#000'); // Black stroke for readability
+        text.setAttribute('stroke-width', '0.5');
+        text.setAttribute('stroke-linejoin', 'round');
+        text.setAttribute('paint-order', 'stroke fill');
         text.setAttribute('transform', `rotate(${textRotation} ${textX} ${textY})`);
         text.textContent = item;
         text.setAttribute('class', 'spinner-item');
