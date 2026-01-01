@@ -170,6 +170,8 @@ main {
     transform-origin: center center;
     will-change: transform;
     display: block;
+    contain: layout style paint;
+    isolation: isolate;
 }
 
 
