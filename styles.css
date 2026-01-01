@@ -192,6 +192,8 @@ main {
 .spinner-svg.locked {
     transition: none !important;
     will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .result-display {
@@ -229,7 +231,7 @@ main {
 
 .spinner-left-container .result-display {
     right: -100px;
-    transform: translateY(-50%);
+    transform: translateY(calc(-50% - 3px));
 }
 
 .spinner-right-container .spinner-pointer {
@@ -242,8 +244,8 @@ main {
 }
 
 .spinner-right-container .result-display {
-    left: -130px;
-    transform: translateY(-50%);
+    left: -100px;
+    transform: translateY(calc(-50% - 3px));
     text-align: right;
 }
 
@@ -252,8 +254,8 @@ main {
 }
 
 @keyframes pulseAnimation {
-    0%, 100% { transform: translateY(-50%) scale(1); }
-    50% { transform: translateY(-50%) scale(1.2); }
+    0%, 100% { transform: translateY(calc(-50% - 3px)) scale(1); }
+    50% { transform: translateY(calc(-50% - 3px)) scale(1.2); }
 }
 
 .spinner-left-container .result-display.rolling {
@@ -265,13 +267,13 @@ main {
 }
 
 @keyframes pulseAnimationLeft {
-    0%, 100% { transform: translateY(-50%) scale(1); }
-    50% { transform: translateY(-50%) scale(1.2); }
+    0%, 100% { transform: translateY(calc(-50% - 3px)) scale(1); }
+    50% { transform: translateY(calc(-50% - 3px)) scale(1.2); }
 }
 
 @keyframes pulseAnimationRight {
-    0%, 100% { transform: translateY(-50%) scale(1); }
-    50% { transform: translateY(-50%) scale(1.2); }
+    0%, 100% { transform: translateY(calc(-50% - 3px)) scale(1); }
+    50% { transform: translateY(calc(-50% - 3px)) scale(1.2); }
 }
 
 .label {
@@ -388,10 +390,12 @@ footer {
     
     .spinner-left-container .result-display {
         right: -90px;
+        transform: translateY(calc(-50% - 3px));
     }
     
     .spinner-right-container .result-display {
-        left: -120px;
+        left: -90px;
+        transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
     
@@ -471,10 +475,12 @@ footer {
     
     .spinner-left-container .result-display {
         right: -85px;
+        transform: translateY(calc(-50% - 3px));
     }
     
     .spinner-right-container .result-display {
-        left: -115px;
+        left: -85px;
+        transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
     

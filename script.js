@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.27';
+const VERSION = '1.0.28';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -319,8 +319,24 @@ function handleRoll() {
             const letterTransform = window.getComputedStyle(letterWheel).transform;
             const numberTransform = window.getComputedStyle(numberWheel).transform;
             console.log(`Re-enabling button. Letter transform: ${letterTransform}, Number transform: ${numberTransform}`);
+            
+            // Temporarily disable button transition to prevent reflow
+            const originalTransition = rollButton.style.transition;
+            rollButton.style.transition = 'none';
+            
+            // Re-enable button
             rollButton.disabled = false;
-            console.log(`Button re-enabled. Letter transform after: ${window.getComputedStyle(letterWheel).transform}, Number transform after: ${window.getComputedStyle(numberWheel).transform}`);
+            
+            // Force a reflow to ensure button state is applied
+            void rollButton.offsetHeight;
+            
+            // Restore transition after a frame
+            requestAnimationFrame(() => {
+                rollButton.style.transition = originalTransition || '';
+                const letterAfter = window.getComputedStyle(letterWheel).transform;
+                const numberAfter = window.getComputedStyle(numberWheel).transform;
+                console.log(`Button re-enabled. Letter transform after: ${letterAfter}, Number transform after: ${numberAfter}`);
+            });
         }
     };
     
