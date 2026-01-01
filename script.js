@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.34';
+const VERSION = '1.35';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -39,7 +39,7 @@ const numbers = Array.from({length: 18}, (_, i) => i + 1);
 // Spinner dimensions
 const SPINNER_CENTER_X = 375;
 const SPINNER_CENTER_Y = 375;
-const SPINNER_RADIUS = 325;
+const SPINNER_RADIUS = 357.5;
 
 // Generate cryptographically secure random number in range [0, max)
 function getSecureRandom(max) {
@@ -109,26 +109,63 @@ function createSpinnerContent(container, items) {
     
     defs.appendChild(gradient);
     
-    // Create texture pattern for weathered look
+    // Create texture pattern for weathered/aged look
     const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
     pattern.setAttribute('id', patternId);
     pattern.setAttribute('patternUnits', 'userSpaceOnUse');
-    pattern.setAttribute('width', '20');
-    pattern.setAttribute('height', '20');
+    pattern.setAttribute('width', '40');
+    pattern.setAttribute('height', '40');
     
-    // Create subtle noise/texture using small circles
-    for (let i = 0; i < 15; i++) {
+    // Create aged texture with multiple layers
+    // Layer 1: Fine grain noise (pitting/oxidation)
+    for (let i = 0; i < 30; i++) {
         const noiseCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        const x = Math.random() * 20;
-        const y = Math.random() * 20;
-        const r = Math.random() * 0.8 + 0.2;
-        const opacity = Math.random() * 0.15 + 0.05;
+        const x = Math.random() * 40;
+        const y = Math.random() * 40;
+        const r = Math.random() * 0.6 + 0.1;
+        const opacity = Math.random() * 0.2 + 0.1;
         noiseCircle.setAttribute('cx', x);
         noiseCircle.setAttribute('cy', y);
         noiseCircle.setAttribute('r', r);
         noiseCircle.setAttribute('fill', '#654321');
         noiseCircle.setAttribute('opacity', opacity);
         pattern.appendChild(noiseCircle);
+    }
+    
+    // Layer 2: Scratches and wear lines
+    for (let i = 0; i < 8; i++) {
+        const scratch = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const x1 = Math.random() * 40;
+        const y1 = Math.random() * 40;
+        const length = Math.random() * 15 + 5;
+        const angle = Math.random() * Math.PI * 2;
+        const x2 = x1 + Math.cos(angle) * length;
+        const y2 = y1 + Math.sin(angle) * length;
+        scratch.setAttribute('x1', x1);
+        scratch.setAttribute('y1', y1);
+        scratch.setAttribute('x2', x2);
+        scratch.setAttribute('y2', y2);
+        scratch.setAttribute('stroke', '#3d2817');
+        scratch.setAttribute('stroke-width', Math.random() * 0.5 + 0.3);
+        scratch.setAttribute('opacity', Math.random() * 0.3 + 0.2);
+        scratch.setAttribute('stroke-linecap', 'round');
+        pattern.appendChild(scratch);
+    }
+    
+    // Layer 3: Patina spots (darker oxidation areas)
+    for (let i = 0; i < 5; i++) {
+        const patina = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        const cx = Math.random() * 40;
+        const cy = Math.random() * 40;
+        const rx = Math.random() * 3 + 1;
+        const ry = Math.random() * 3 + 1;
+        patina.setAttribute('cx', cx);
+        patina.setAttribute('cy', cy);
+        patina.setAttribute('rx', rx);
+        patina.setAttribute('ry', ry);
+        patina.setAttribute('fill', '#3d2817');
+        patina.setAttribute('opacity', Math.random() * 0.25 + 0.15);
+        pattern.appendChild(patina);
     }
     
     defs.appendChild(pattern);
@@ -143,14 +180,23 @@ function createSpinnerContent(container, items) {
     circle.setAttribute('stroke-width', '8');
     container.appendChild(circle);
     
-    // Add texture overlay circle (matches the base circle exactly)
+    // Add texture overlay circle (matches the base circle exactly) - primary texture layer
     const textureCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     textureCircle.setAttribute('cx', SPINNER_CENTER_X);
     textureCircle.setAttribute('cy', SPINNER_CENTER_Y);
     textureCircle.setAttribute('r', SPINNER_RADIUS);
     textureCircle.setAttribute('fill', `url(#${patternId})`);
-    textureCircle.setAttribute('opacity', '0.25');
+    textureCircle.setAttribute('opacity', '0.45');
     container.appendChild(textureCircle);
+    
+    // Add secondary texture layer for additional depth and aging (slightly offset)
+    const textureCircle2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    textureCircle2.setAttribute('cx', SPINNER_CENTER_X);
+    textureCircle2.setAttribute('cy', SPINNER_CENTER_Y);
+    textureCircle2.setAttribute('r', SPINNER_RADIUS);
+    textureCircle2.setAttribute('fill', `url(#${patternId})`);
+    textureCircle2.setAttribute('opacity', '0.2');
+    container.appendChild(textureCircle2);
     
     // Create gold/bronze radiating lines from center (one line per segment)
     for (let i = 0; i < items.length; i++) {

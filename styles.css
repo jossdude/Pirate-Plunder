@@ -14,8 +14,8 @@
     --pirate-red: #8b0000;
     --pirate-orange: #ff8c00;
     --vh: 1vh;
-    --spinner-diameter: 650px;
-    --spinner-radius: 325px;
+    --spinner-diameter: 715px;
+    --spinner-radius: 357.5px;
     /* Old gold color palette */
     --gold-dark: #8b6914;
     --gold-medium: #cd853f;
@@ -155,14 +155,14 @@ main {
     position: absolute;
     left: calc(-1 * var(--spinner-diameter) / 2 + 0.15 * var(--spinner-radius));
     top: 50%;
-    transform: translateY(calc(-50% - 0.5 * var(--spinner-radius)));
+    transform: translateY(calc(-50% - 0.6 * var(--spinner-radius)));
 }
 
 .spinner-right-container {
     position: absolute;
     right: calc(-1 * var(--spinner-diameter) / 2 + 0.15 * var(--spinner-radius));
     top: 50%;
-    transform: translateY(calc(-50% + 0.75 * var(--spinner-radius)));
+    transform: translateY(calc(-50% + 0.85 * var(--spinner-radius)));
 }
 
 .spinner-divider {
@@ -222,12 +222,12 @@ main {
 }
 
 .spinner-left-container .result-display {
-    right: -93px;
+    right: -102px;
     transform: translateY(calc(-50% - 3px));
 }
 
 .spinner-right-container .result-display {
-    left: -149px;
+    left: -164px;
     transform: translateY(calc(-50% - 3px));
     text-align: right;
 }
@@ -327,8 +327,8 @@ footer {
 /* Mobile Responsive */
 @media (max-width: 768px) {
     :root {
-        --spinner-diameter: 390px;
-        --spinner-radius: 195px;
+        --spinner-diameter: 429px;
+        --spinner-radius: 214.5px;
     }
     
     body {
@@ -373,12 +373,12 @@ footer {
     }
     
     .spinner-left-container .result-display {
-        right: -84px;
+        right: -92px;
         transform: translateY(calc(-50% - 3px));
     }
     
     .spinner-right-container .result-display {
-        left: -130px;
+        left: -143px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
@@ -400,8 +400,8 @@ footer {
 
 @media (max-width: 480px) {
     :root {
-        --spinner-diameter: 310px;
-        --spinner-radius: 155px;
+        --spinner-diameter: 341px;
+        --spinner-radius: 170.5px;
     }
     
     body {
@@ -445,12 +445,12 @@ footer {
     }
     
     .spinner-left-container .result-display {
-        right: -79px;
+        right: -87px;
         transform: translateY(calc(-50% - 3px));
     }
     
     .spinner-right-container .result-display {
-        left: -125px;
+        left: -137px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
