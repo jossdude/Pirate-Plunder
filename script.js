@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.23';
+const VERSION = '1.0.25';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -231,7 +231,10 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
                     wheel.classList.remove('spinning');
                     wheel.classList.add('locked'); // Add locked class to prevent CSS transitions
                     resultElement.classList.remove('rolling');
-                    if (onComplete) onComplete();
+                    // Wait for browser to paint locked position before re-enabling button
+                    requestAnimationFrame(() => {
+                        if (onComplete) onComplete();
+                    });
                 }
             };
             
@@ -245,7 +248,10 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
                 wheel.classList.remove('spinning');
                 wheel.classList.add('locked'); // Add locked class to prevent CSS transitions
                 resultElement.classList.remove('rolling');
-                if (onComplete) onComplete();
+                // Wait for browser to paint locked position before re-enabling button
+                requestAnimationFrame(() => {
+                    if (onComplete) onComplete();
+                });
             }, 250);
             
             return;

@@ -194,8 +194,8 @@ main {
 
 .result-display {
     position: absolute;
-    top: calc(50% - 80px);
-    font-size: 2.5rem;
+    top: 50%;
+    font-size: 8rem;
     font-weight: bold;
     color: var(--pirate-gold);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
@@ -204,6 +204,7 @@ main {
     min-width: 60px;
     text-align: center;
     line-height: 1;
+    transform: translateY(-50%);
 }
 
 .spinner-pointer {
@@ -225,8 +226,8 @@ main {
 }
 
 .spinner-left-container .result-display {
-    right: -15px;
-    transform: translateX(50%);
+    right: -100px;
+    transform: translateY(-50%);
 }
 
 .spinner-right-container .spinner-pointer {
@@ -239,8 +240,8 @@ main {
 }
 
 .spinner-right-container .result-display {
-    left: -15px;
-    transform: translateX(-50%);
+    left: -100px;
+    transform: translateY(-50%);
 }
 
 .result-display.rolling {
@@ -248,8 +249,8 @@ main {
 }
 
 @keyframes pulseAnimation {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.2); }
 }
 
 .spinner-left-container .result-display.rolling {
@@ -261,13 +262,13 @@ main {
 }
 
 @keyframes pulseAnimationLeft {
-    0%, 100% { transform: translateX(50%) scale(1); }
-    50% { transform: translateX(50%) scale(1.2); }
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.2); }
 }
 
 @keyframes pulseAnimationRight {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.2); }
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    50% { transform: translateY(-50%) scale(1.2); }
 }
 
 .label {
@@ -378,8 +379,16 @@ footer {
     }
     
     .result-display {
-        font-size: 1.8rem;
-        top: calc(50% - 70px);
+        font-size: 6rem;
+        top: 50%;
+    }
+    
+    .spinner-left-container .result-display {
+        right: -90px;
+    }
+    
+    .spinner-right-container .result-display {
+        left: -90px;
     }
     
     .spinner-left-container .spinner-pointer {
@@ -452,8 +461,16 @@ footer {
     }
     
     .result-display {
-        font-size: 1.4rem;
-        top: calc(50% - 60px);
+        font-size: 5rem;
+        top: 50%;
+    }
+    
+    .spinner-left-container .result-display {
+        right: -85px;
+    }
+    
+    .spinner-right-container .result-display {
+        left: -85px;
     }
     
     .spinner-left-container .spinner-pointer {
