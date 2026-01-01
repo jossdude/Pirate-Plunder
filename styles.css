@@ -211,40 +211,13 @@ main {
     transform: translateY(-50%);
 }
 
-.spinner-pointer {
-    position: absolute;
-    width: 0;
-    height: 0;
-    z-index: 20;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-    pointer-events: none;
-}
-
-.spinner-left-container .spinner-pointer {
-    top: 50%;
-    right: -15px;
-    transform: translateY(-50%);
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
-    border-right: 30px solid #000;
-}
-
 .spinner-left-container .result-display {
     right: -100px;
     transform: translateY(calc(-50% - 3px));
 }
 
-.spinner-right-container .spinner-pointer {
-    top: 50%;
-    left: -15px;
-    transform: translateY(-50%);
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
-    border-left: 30px solid #000;
-}
-
 .spinner-right-container .result-display {
-    left: -120px;
+    left: -160px;
     transform: translateY(calc(-50% - 3px));
     text-align: right;
 }
@@ -284,15 +257,15 @@ main {
 }
 
 .roll-button {
-    background: transparent;
+    background: var(--pirate-gold);
     color: #000;
-    border: 3px solid #000;
+    border: 3px solid var(--pirate-gold-light);
     border-radius: 15px;
     padding: 15px 40px;
     font-size: 1.2rem;
     font-weight: normal;
     cursor: pointer;
-    box-shadow: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -314,14 +287,15 @@ main {
 
 .roll-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    background: var(--pirate-gold-light);
+    border-color: var(--pirate-gold);
 }
 
 .roll-button:active {
     transform: translateY(0);
-    box-shadow: none;
-    background: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    background: var(--pirate-gold);
 }
 
 .roll-button:disabled {
@@ -394,24 +368,11 @@ footer {
     }
     
     .spinner-right-container .result-display {
-        left: -110px;
+        left: -140px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
     
-    .spinner-left-container .spinner-pointer {
-        right: -12px;
-        border-top-width: 12px;
-        border-bottom-width: 12px;
-        border-right-width: 24px;
-    }
-    
-    .spinner-right-container .spinner-pointer {
-        left: -12px;
-        border-top-width: 12px;
-        border-bottom-width: 12px;
-        border-left-width: 24px;
-    }
     
     .roll-button {
         font-size: 1rem;
@@ -479,24 +440,11 @@ footer {
     }
     
     .spinner-right-container .result-display {
-        left: -105px;
+        left: -135px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
     
-    .spinner-left-container .spinner-pointer {
-        right: -10px;
-        border-top-width: 10px;
-        border-bottom-width: 10px;
-        border-right-width: 20px;
-    }
-    
-    .spinner-right-container .spinner-pointer {
-        left: -10px;
-        border-top-width: 10px;
-        border-bottom-width: 10px;
-        border-left-width: 20px;
-    }
     
     .roll-button {
         font-size: 0.85rem;
