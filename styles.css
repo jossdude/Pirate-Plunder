@@ -240,8 +240,9 @@ main {
 }
 
 .spinner-right-container .result-display {
-    left: -100px;
+    left: -130px;
     transform: translateY(-50%);
+    text-align: right;
 }
 
 .result-display.rolling {
@@ -388,7 +389,8 @@ footer {
     }
     
     .spinner-right-container .result-display {
-        left: -90px;
+        left: -120px;
+        text-align: right;
     }
     
     .spinner-left-container .spinner-pointer {
@@ -470,7 +472,8 @@ footer {
     }
     
     .spinner-right-container .result-display {
-        left: -85px;
+        left: -115px;
+        text-align: right;
     }
     
     .spinner-left-container .spinner-pointer {

@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.0.25';
+const VERSION = '1.0.26';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
@@ -211,6 +211,9 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
         const shouldStop = hasMinDuration && hasSpunEnough && isSlowEnough;
         
         if (shouldStop || frameCount > 600) { // Safety limit
+            const wheelId = wheel.id || 'unknown';
+            console.log(`[${wheelId}] Spin stopping at rotation: ${rotation.toFixed(2)}°, target: ${targetRotation.toFixed(2)}°`);
+            
             // Set the final result immediately to prevent any visual jump
             resultElement.textContent = targetItem;
             resultElement.classList.add('rolling');
@@ -219,11 +222,15 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
             wheel.style.transition = 'transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             wheel.style.transform = `rotate(${targetRotation}deg)`;
             rotationState.value = targetRotation; // Update tracked rotation
+            console.log(`[${wheelId}] Set final transform: rotate(${targetRotation.toFixed(2)}deg), transition: 0.2s`);
             
             // Wait for transition to complete, then lock position
             const handleTransitionEnd = (e) => {
                 // Only handle transform transitions
                 if (e.target === wheel && e.propertyName === 'transform') {
+                    const computedTransform = window.getComputedStyle(wheel).transform;
+                    console.log(`[${wheelId}] TransitionEnd fired, computed transform: ${computedTransform}`);
+                    
                     wheel.removeEventListener('transitionend', handleTransitionEnd);
                     // Permanently disable transitions and lock position
                     wheel.style.transition = 'none';
@@ -231,9 +238,24 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
                     wheel.classList.remove('spinning');
                     wheel.classList.add('locked'); // Add locked class to prevent CSS transitions
                     resultElement.classList.remove('rolling');
-                    // Wait for browser to paint locked position before re-enabling button
+                    console.log(`[${wheelId}] Locked position: rotate(${targetRotation.toFixed(2)}deg), transition: none`);
+                    
+                    // Force layout recalculation and wait for browser to paint locked position
+                    // Double RAF ensures style application and paint completion
                     requestAnimationFrame(() => {
-                        if (onComplete) onComplete();
+                        const afterLockTransform = window.getComputedStyle(wheel).transform;
+                        console.log(`[${wheelId}] RAF1: After lock, computed transform: ${afterLockTransform}`);
+                        // Force layout read to ensure styles are applied
+                        void wheel.offsetHeight; // Force reflow
+                        requestAnimationFrame(() => {
+                            const beforeCompleteTransform = window.getComputedStyle(wheel).transform;
+                            console.log(`[${wheelId}] RAF2: Before onComplete, computed transform: ${beforeCompleteTransform}`);
+                            // Now safe to re-enable button
+                            if (onComplete) {
+                                console.log(`[${wheelId}] Calling onComplete`);
+                                onComplete();
+                            }
+                        });
                     });
                 }
             };
@@ -242,15 +264,33 @@ function spinWheel(wheel, items, resultElement, baseDuration = 3000, onComplete 
             
             // Fallback timeout in case transitionend doesn't fire
             setTimeout(() => {
+                const computedTransform = window.getComputedStyle(wheel).transform;
+                console.log(`[${wheelId}] Fallback timeout fired, computed transform: ${computedTransform}`);
+                
                 wheel.removeEventListener('transitionend', handleTransitionEnd);
                 wheel.style.transition = 'none';
                 wheel.style.transform = `rotate(${targetRotation}deg)`;
                 wheel.classList.remove('spinning');
                 wheel.classList.add('locked'); // Add locked class to prevent CSS transitions
                 resultElement.classList.remove('rolling');
-                // Wait for browser to paint locked position before re-enabling button
+                console.log(`[${wheelId}] Fallback: Locked position: rotate(${targetRotation.toFixed(2)}deg), transition: none`);
+                
+                // Force layout recalculation and wait for browser to paint locked position
+                // Double RAF ensures style application and paint completion
                 requestAnimationFrame(() => {
-                    if (onComplete) onComplete();
+                    const afterLockTransform = window.getComputedStyle(wheel).transform;
+                    console.log(`[${wheelId}] Fallback RAF1: After lock, computed transform: ${afterLockTransform}`);
+                    // Force layout read to ensure styles are applied
+                    void wheel.offsetHeight; // Force reflow
+                    requestAnimationFrame(() => {
+                        const beforeCompleteTransform = window.getComputedStyle(wheel).transform;
+                        console.log(`[${wheelId}] Fallback RAF2: Before onComplete, computed transform: ${beforeCompleteTransform}`);
+                        // Now safe to re-enable button
+                        if (onComplete) {
+                            console.log(`[${wheelId}] Fallback: Calling onComplete`);
+                            onComplete();
+                        }
+                    });
                 });
             }, 250);
             
@@ -270,6 +310,11 @@ let activeSpins = 0;
 
 // Handle roll button click
 function handleRoll() {
+    console.log('=== SPIN STARTED ===');
+    const letterTransformBefore = window.getComputedStyle(letterWheel).transform;
+    const numberTransformBefore = window.getComputedStyle(numberWheel).transform;
+    console.log(`Before spin - Letter transform: ${letterTransformBefore}, Number transform: ${numberTransformBefore}`);
+    
     // Disable button during roll
     rollButton.disabled = true;
     activeSpins = 2;
@@ -277,8 +322,13 @@ function handleRoll() {
     // Callback to re-enable button when spins complete
     const onSpinComplete = () => {
         activeSpins--;
+        console.log(`Button re-enable: activeSpins = ${activeSpins}`);
         if (activeSpins === 0) {
+            const letterTransform = window.getComputedStyle(letterWheel).transform;
+            const numberTransform = window.getComputedStyle(numberWheel).transform;
+            console.log(`Re-enabling button. Letter transform: ${letterTransform}, Number transform: ${numberTransform}`);
             rollButton.disabled = false;
+            console.log(`Button re-enabled. Letter transform after: ${window.getComputedStyle(letterWheel).transform}, Number transform after: ${window.getComputedStyle(numberWheel).transform}`);
         }
     };
     
