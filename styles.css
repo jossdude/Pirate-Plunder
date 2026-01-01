@@ -21,7 +21,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, var(--pirate-dark-blue) 0%, var(--pirate-navy) 100%);
+    background: #1a2332;
     min-height: 100vh;
     min-height: calc(var(--vh, 1vh) * 100);
     display: flex;
@@ -244,7 +244,7 @@ main {
 }
 
 .spinner-right-container .result-display {
-    left: -100px;
+    left: -120px;
     transform: translateY(calc(-50% - 3px));
     text-align: right;
 }
@@ -394,7 +394,7 @@ footer {
     }
     
     .spinner-right-container .result-display {
-        left: -90px;
+        left: -110px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
@@ -479,7 +479,7 @@ footer {
     }
     
     .spinner-right-container .result-display {
-        left: -85px;
+        left: -105px;
         transform: translateY(calc(-50% - 3px));
         text-align: right;
     }
