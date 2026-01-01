@@ -155,14 +155,14 @@ main {
     position: absolute;
     left: calc(-1 * var(--spinner-diameter) / 2 + 0.15 * var(--spinner-radius));
     top: 50%;
-    transform: translateY(calc(-50% - 0.4 * var(--spinner-radius)));
+    transform: translateY(calc(-50% - 0.5 * var(--spinner-radius)));
 }
 
 .spinner-right-container {
     position: absolute;
     right: calc(-1 * var(--spinner-diameter) / 2 + 0.15 * var(--spinner-radius));
     top: 50%;
-    transform: translateY(calc(-50% + 0.666667 * var(--spinner-radius)));
+    transform: translateY(calc(-50% + 0.75 * var(--spinner-radius)));
 }
 
 .spinner-divider {

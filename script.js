@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.33';
+const VERSION = '1.34';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // Set viewport height to account for mobile browser UI
