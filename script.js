@@ -78,6 +78,32 @@ const settings = loadSettings();
 checkDailyReset();
 let usedCombos = loadUsedCombos();
 
+function comboKey(letter, number) {
+    return `${letter}${number}`;
+}
+
+function getRemainingCombos(lettersArr, numbersArr) {
+    const used = new Set(usedCombos);
+    const remaining = [];
+    for (let li = 0; li < lettersArr.length; li++) {
+        for (let ni = 0; ni < numbersArr.length; ni++) {
+            const key = comboKey(lettersArr[li], numbersArr[ni]);
+            if (!used.has(key)) {
+                remaining.push({ letterIdx: li, numberIdx: ni, key });
+            }
+        }
+    }
+    return remaining;
+}
+
+function markComboUsed(letter, number) {
+    const key = comboKey(letter, number);
+    if (!usedCombos.includes(key)) {
+        usedCombos.push(key);
+        saveUsedCombos(usedCombos);
+    }
+}
+
 // Set viewport height to account for mobile browser UI
 function setViewportHeight() {
     const vh = window.innerHeight * 0.01;
@@ -498,9 +524,9 @@ if (letterResult) letterResult.textContent = getItemAtPointer(letters, 0, 0);
 if (numberResult) numberResult.textContent = getItemAtPointer(numbers, 0, 180);
 
 // Spin wheel continuously, then stop after delay
-function spinWheel(wheel, items, resultElement, rotationState, pointerAngle, stopDelay, onStop) {
-    // Generate random target using secure randomness
-    const targetIndex = getSecureRandom(items.length);
+function spinWheel(wheel, items, resultElement, rotationState, pointerAngle, stopDelay, onStop, forcedIndex) {
+    // Use forced target index if provided (no-repeats mode), else pick randomly
+    const targetIndex = (typeof forcedIndex === 'number') ? forcedIndex : getSecureRandom(items.length);
     const targetItem = items[targetIndex];
     
     // Calculate angle per item
@@ -585,24 +611,46 @@ function handleRoll() {
     if (isSpinning) {
         return;
     }
-    
+
     console.log('=== SPIN STARTED ===');
-    
+
+    // Catch midnight crossings within an active session — sync in-memory
+    // history with storage if the day rolled over.
+    if (checkDailyReset()) {
+        usedCombos = [];
+    }
+
+    // Decide forced indices if no-repeats is on
+    let forcedLetterIdx;
+    let forcedNumberIdx;
+    if (settings.noRepeats === 'on') {
+        let remaining = getRemainingCombos(letters, numbers);
+        if (remaining.length === 0) {
+            // Auto-reset: every combo used. Clear silently and pick from a fresh set.
+            usedCombos = [];
+            saveUsedCombos(usedCombos);
+            remaining = getRemainingCombos(letters, numbers);
+        }
+        const pick = remaining[getSecureRandom(remaining.length)];
+        forcedLetterIdx = pick.letterIdx;
+        forcedNumberIdx = pick.numberIdx;
+    }
+
     // Disable button during spin
     rollButton.disabled = true;
     if (settingsGear) settingsGear.disabled = true;
     isSpinning = true;
-    
+
     // Generate random stop time between 1000-3000ms
     const stopDelay = 1000 + getSecureRandom(2000); // 1000-3000ms
     console.log(`Spinners will stop after ${stopDelay}ms`);
-    
+
     // Re-enable button after a very short delay (50-100ms)
     setTimeout(() => {
         rollButton.disabled = false;
         console.log('Button re-enabled (spinners still spinning)');
     }, 75); // 75ms delay
-    
+
     // Callback when spinners stop
     let stoppedCount = 0;
     const onSpinnerStop = () => {
@@ -610,15 +658,20 @@ function handleRoll() {
         if (stoppedCount === 2) {
             isSpinning = false;
             if (settingsGear) settingsGear.disabled = false;
+            if (settings.noRepeats === 'on'
+                && typeof forcedLetterIdx === 'number'
+                && typeof forcedNumberIdx === 'number') {
+                markComboUsed(letters[forcedLetterIdx], numbers[forcedNumberIdx]);
+            }
             console.log('Both spinners stopped');
         }
     };
-    
+
     // Spin both wheels with the same stop delay
     // Left spinner: pointer at right side (0 degrees in SVG coordinates)
     // Right spinner: pointer at left side (180 degrees in SVG coordinates)
-    spinWheel(letterWheel, letters, letterResult, letterWheelRotation, 0, stopDelay, onSpinnerStop);
-    spinWheel(numberWheel, numbers, numberResult, numberWheelRotation, 180, stopDelay, onSpinnerStop);
+    spinWheel(letterWheel, letters, letterResult, letterWheelRotation, 0, stopDelay, onSpinnerStop, forcedLetterIdx);
+    spinWheel(numberWheel, numbers, numberResult, numberWheelRotation, 180, stopDelay, onSpinnerStop, forcedNumberIdx);
 }
 
 // Add event listener to roll button
