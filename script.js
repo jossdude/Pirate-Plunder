@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.39';
+const VERSION = '1.40';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // ============================================================
@@ -568,12 +568,17 @@ function rebuildNumberWheel() {
 
 // Keep full viewBox - CSS will handle the clipping to show half of each spinner
 
-// Helper function to calculate which item is at a pointer position
+// Helper function to calculate which item is at a pointer position.
+// Items are placed in wheel coordinates with item i centered at
+// (i * step + step/2 - 90) degrees, so item i's segment spans
+// [i*step - 90, i*step - 60). To find which item sits at world angle P
+// when the wheel is rotated by R, take the wheel-frame angle (P - R) and
+// add 90° so segment boundaries land at multiples of step before flooring.
 function getItemAtPointer(items, rotation, pointerAngle) {
     const anglePerItem = 360 / items.length;
-    const normalizedRotation = ((rotation % 360) + 360) % 360;
-    const adjustedAngle = (pointerAngle - normalizedRotation + 360) % 360;
-    const currentIndex = Math.floor(adjustedAngle / anglePerItem) % items.length;
+    const wheelAngle = pointerAngle - rotation + 90;
+    const normalized = ((wheelAngle % 360) + 360) % 360;
+    const currentIndex = Math.floor(normalized / anglePerItem) % items.length;
     return items[currentIndex];
 }
 
@@ -596,16 +601,18 @@ function spinWheel(wheel, items, resultElement, rotationState, pointerAngle, sto
     // Left spinner: 0 degrees (right side)
     // Right spinner: 180 degrees (left side)
     // Each item is centered at index * anglePerItem + anglePerItem/2 - 90 degrees
-    // We want the center of the target item to align with the pointer
+    // We want the centre of the target item to land at the pointer after the
+    // wheel finishes rotating. The wheel rotates forward from its current
+    // position, so compute the smallest non-negative delta that brings the
+    // target item to the pointer (mod 360), then layer extra full rotations
+    // on top for visual effect.
     const itemCenterAngle = targetIndex * anglePerItem + anglePerItem / 2 - 90;
-    const targetAngle = pointerAngle - itemCenterAngle;
-    
-    // Use tracked rotation state
     const startRotation = rotationState.value;
-    
+    const deltaToTarget = (((pointerAngle - itemCenterAngle - startRotation) % 360) + 360) % 360;
+
     // Calculate final rotation (add some full rotations for visual effect)
     const extraRotations = 2 + getSecureRandom(2); // 2-3 full rotations
-    const finalRotation = startRotation + extraRotations * 360 + targetAngle;
+    const finalRotation = startRotation + extraRotations * 360 + deltaToTarget;
     
     // Start continuous spinning
     wheel.classList.add('spinning');
