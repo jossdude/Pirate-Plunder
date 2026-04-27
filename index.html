@@ -8,6 +8,44 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <button class="settings-gear" id="settings-gear" aria-label="Settings" type="button">
+        <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+            <path fill="currentColor" d="M19.14 12.94a7.49 7.49 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.61-.22l-2.39.96a7.39 7.39 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.59.24-1.13.55-1.62.94l-2.39-.96a.5.5 0 0 0-.61.22L2.71 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.49 7.49 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.14.24.43.34.68.22l2.39-.96c.49.39 1.03.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.59-.24 1.13-.55 1.62-.94l2.39.96a.5.5 0 0 0 .61-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/>
+        </svg>
+    </button>
+
+    <div class="settings-modal" id="settings-modal" hidden>
+        <div class="settings-backdrop" id="settings-backdrop"></div>
+        <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+            <h2 class="settings-title" id="settings-title">Settings</h2>
+
+            <div class="settings-row">
+                <span class="settings-label">Players</span>
+                <div class="segmented" role="radiogroup" aria-label="Player count">
+                    <button type="button" class="segment" data-value="two" role="radio" aria-checked="false">2</button>
+                    <button type="button" class="segment" data-value="many" role="radio" aria-checked="true">3+</button>
+                </div>
+            </div>
+
+            <div class="settings-row">
+                <span class="settings-label">No repeats</span>
+                <button type="button" class="toggle" id="toggle-no-repeats" role="switch" aria-checked="false">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </button>
+            </div>
+
+            <div class="settings-row">
+                <span class="settings-label">Sound</span>
+                <button type="button" class="toggle" id="toggle-sound" role="switch" aria-checked="true">
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                </button>
+            </div>
+
+            <button type="button" class="settings-action" id="new-game-button">New Game</button>
+            <button type="button" class="settings-close" id="settings-close">Close</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>Plunder: A Pirates Life</h1>

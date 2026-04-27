@@ -1,7 +1,82 @@
 
 // Version number
-const VERSION = '1.37';
+const VERSION = '1.38';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
+
+// ============================================================
+// Settings: persistence + state
+// ============================================================
+const STORAGE_KEYS = {
+    playerMode: 'plunder.playerMode',
+    noRepeats: 'plunder.noRepeats',
+    soundEnabled: 'plunder.soundEnabled',
+    usedCombos: 'plunder.usedCombos',
+    lastResetDate: 'plunder.lastResetDate',
+};
+
+const DEFAULT_SETTINGS = {
+    playerMode: 'many',
+    noRepeats: 'off',
+    soundEnabled: 'on',
+};
+
+function safeGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+
+function safeSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* ignore */ }
+}
+
+function loadSettings() {
+    return {
+        playerMode: safeGet(STORAGE_KEYS.playerMode) || DEFAULT_SETTINGS.playerMode,
+        noRepeats: safeGet(STORAGE_KEYS.noRepeats) || DEFAULT_SETTINGS.noRepeats,
+        soundEnabled: safeGet(STORAGE_KEYS.soundEnabled) || DEFAULT_SETTINGS.soundEnabled,
+    };
+}
+
+function saveSetting(key, value) {
+    safeSet(STORAGE_KEYS[key], value);
+}
+
+function loadUsedCombos() {
+    try {
+        const raw = safeGet(STORAGE_KEYS.usedCombos);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function saveUsedCombos(combos) {
+    try { safeSet(STORAGE_KEYS.usedCombos, JSON.stringify(combos)); } catch (e) { /* ignore */ }
+}
+
+function todayLocalDateString() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+}
+
+function checkDailyReset() {
+    const today = todayLocalDateString();
+    const last = safeGet(STORAGE_KEYS.lastResetDate);
+    if (last !== today) {
+        saveUsedCombos([]);
+        safeSet(STORAGE_KEYS.lastResetDate, today);
+        return true;
+    }
+    return false;
+}
+
+const settings = loadSettings();
+checkDailyReset();
+let usedCombos = loadUsedCombos();
 
 // Set viewport height to account for mobile browser UI
 function setViewportHeight() {
@@ -34,7 +109,13 @@ const numberWheelRotation = { value: 0 };
 
 // Wheel data
 const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
-const numbers = Array.from({length: 18}, (_, i) => i + 1);
+
+function getNumberRange() {
+    const max = settings.playerMode === 'two' ? 12 : 18;
+    return Array.from({length: max}, (_, i) => i + 1);
+}
+
+let numbers = getNumberRange();
 
 // Spinner dimensions
 const SPINNER_CENTER_X = 375;
@@ -358,6 +439,47 @@ if (!letterContentGroup || !numberContentGroup) {
     createSpinnerContent(numberContentGroup, numbers);
 }
 
+function rebuildNumberWheel() {
+    if (!numberContentGroup) return;
+    // Remove only the defs entries scoped to the number spinner so we don't
+    // accumulate duplicate gradients/patterns/filters on every rebuild.
+    const svg = numberContentGroup.ownerSVGElement;
+    if (svg) {
+        const defs = svg.querySelector('defs');
+        if (defs) {
+            const scopeSuffix = numberContentGroup.id || 'number';
+            const scopedIds = [
+                `goldGradient-${scopeSuffix}`,
+                `goldPattern-${scopeSuffix}`,
+                `textureBlur-${scopeSuffix}`,
+                `dropShadow-${scopeSuffix}`,
+            ];
+            scopedIds.forEach(id => {
+                const node = defs.querySelector(`[id="${id}"]`);
+                if (node) node.remove();
+            });
+        }
+    }
+
+    while (numberContentGroup.firstChild) {
+        numberContentGroup.removeChild(numberContentGroup.firstChild);
+    }
+
+    numbers = getNumberRange();
+
+    numberWheelRotation.value = 0;
+    numberWheel.style.transition = 'none';
+    numberWheel.style.transform = 'rotate(0deg)';
+    numberWheel.classList.remove('spinning');
+    numberWheel.classList.remove('locked');
+
+    createSpinnerContent(numberContentGroup, numbers);
+
+    if (numberResult) {
+        numberResult.textContent = getItemAtPointer(numbers, 0, 180);
+    }
+}
+
 // Keep full viewBox - CSS will handle the clipping to show half of each spinner
 
 // Helper function to calculate which item is at a pointer position
@@ -468,6 +590,7 @@ function handleRoll() {
     
     // Disable button during spin
     rollButton.disabled = true;
+    if (settingsGear) settingsGear.disabled = true;
     isSpinning = true;
     
     // Generate random stop time between 1000-3000ms
@@ -486,6 +609,7 @@ function handleRoll() {
         stoppedCount++;
         if (stoppedCount === 2) {
             isSpinning = false;
+            if (settingsGear) settingsGear.disabled = false;
             console.log('Both spinners stopped');
         }
     };
@@ -507,4 +631,77 @@ document.addEventListener('keydown', (event) => {
         handleRoll();
     }
 });
+
+// ============================================================
+// Settings modal wiring
+// ============================================================
+const settingsGear = document.getElementById('settings-gear');
+const settingsModal = document.getElementById('settings-modal');
+const settingsBackdrop = document.getElementById('settings-backdrop');
+const settingsCloseButton = document.getElementById('settings-close');
+const newGameButton = document.getElementById('new-game-button');
+const noRepeatsToggle = document.getElementById('toggle-no-repeats');
+const soundToggle = document.getElementById('toggle-sound');
+const segmentButtons = document.querySelectorAll('.segment');
+
+function syncSettingsUi() {
+    segmentButtons.forEach(btn => {
+        const isActive = btn.dataset.value === settings.playerMode;
+        btn.setAttribute('aria-checked', isActive ? 'true' : 'false');
+    });
+    noRepeatsToggle.setAttribute('aria-checked', settings.noRepeats === 'on' ? 'true' : 'false');
+    soundToggle.setAttribute('aria-checked', settings.soundEnabled === 'on' ? 'true' : 'false');
+}
+
+function openSettings() {
+    if (isSpinning) return;
+    checkDailyReset();
+    usedCombos = loadUsedCombos();
+    syncSettingsUi();
+    settingsModal.hidden = false;
+}
+
+function closeSettings() {
+    settingsModal.hidden = true;
+}
+
+settingsGear.addEventListener('click', openSettings);
+settingsBackdrop.addEventListener('click', closeSettings);
+settingsCloseButton.addEventListener('click', closeSettings);
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !settingsModal.hidden) {
+        closeSettings();
+    }
+});
+
+segmentButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const value = btn.dataset.value;
+        if (settings.playerMode === value) return;
+        settings.playerMode = value;
+        saveSetting('playerMode', value);
+        syncSettingsUi();
+        rebuildNumberWheel();
+    });
+});
+
+noRepeatsToggle.addEventListener('click', () => {
+    settings.noRepeats = settings.noRepeats === 'on' ? 'off' : 'on';
+    saveSetting('noRepeats', settings.noRepeats);
+    syncSettingsUi();
+});
+
+soundToggle.addEventListener('click', () => {
+    settings.soundEnabled = settings.soundEnabled === 'on' ? 'off' : 'on';
+    saveSetting('soundEnabled', settings.soundEnabled);
+    syncSettingsUi();
+});
+
+newGameButton.addEventListener('click', () => {
+    usedCombos = [];
+    saveUsedCombos(usedCombos);
+});
+
+syncSettingsUi();
 
