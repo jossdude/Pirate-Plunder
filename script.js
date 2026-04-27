@@ -1,6 +1,6 @@
 
 // Version number
-const VERSION = '1.38';
+const VERSION = '1.39';
 console.log(`Plunder: A Pirates Life - Version ${VERSION}`);
 
 // ============================================================
@@ -102,6 +102,66 @@ function markComboUsed(letter, number) {
         usedCombos.push(key);
         saveUsedCombos(usedCombos);
     }
+}
+
+// ============================================================
+// Stop feedback: vibration + synthesized thunk
+// ============================================================
+let audioCtx = null;
+
+function ensureAudioContext() {
+    if (audioCtx) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
+        }
+        return audioCtx;
+    }
+    try {
+        const Ctor = window.AudioContext || window.webkitAudioContext;
+        if (!Ctor) return null;
+        audioCtx = new Ctor();
+        return audioCtx;
+    } catch (e) {
+        return null;
+    }
+}
+
+function playThunk() {
+    if (settings.soundEnabled !== 'on') return;
+    const ctx = audioCtx;
+    if (!ctx || ctx.state !== 'running') return;
+    try {
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        // Quick downward pitch sweep gives a soft "thunk" feel.
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.4, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+        osc.connect(gain).connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.15);
+    } catch (e) {
+        /* ignore */
+    }
+}
+
+function vibrate() {
+    try {
+        if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(50);
+        }
+    } catch (e) {
+        /* ignore */
+    }
+}
+
+function fireStopFeedback() {
+    vibrate();
+    playThunk();
 }
 
 // Set viewport height to account for mobile browser UI
@@ -582,19 +642,22 @@ function spinWheel(wheel, items, resultElement, rotationState, pointerAngle, sto
         // Set final result
         resultElement.textContent = targetItem;
         resultElement.classList.add('rolling');
-        
+
         // Snap immediately to final position
         wheel.style.transition = 'none';
         wheel.style.transform = `rotate(${finalRotation}deg)`;
         rotationState.value = finalRotation;
         wheel.classList.remove('spinning');
         wheel.classList.add('locked');
-        
+
+        // Stop feedback (vibration + sound) — visuals handled by .rolling class
+        fireStopFeedback();
+
         // Remove rolling class after brief moment
         setTimeout(() => {
             resultElement.classList.remove('rolling');
-        }, 300);
-        
+        }, 500);
+
         // Call stop callback
         if (onStop) {
             onStop();
@@ -613,6 +676,9 @@ function handleRoll() {
     }
 
     console.log('=== SPIN STARTED ===');
+
+    // Unlock audio inside the user-gesture context (required by iOS Safari).
+    ensureAudioContext();
 
     // Catch midnight crossings within an active session — sync in-memory
     // history with storage if the day rolled over.

@@ -233,30 +233,30 @@ main {
 }
 
 .result-display.rolling {
-    animation: pulseAnimation 0.5s ease-in-out;
+    animation: pulseAnimation 0.45s cubic-bezier(0.25, 1.4, 0.5, 1);
 }
 
 @keyframes pulseAnimation {
-    0%, 100% { transform: translateY(calc(-50% - 3px)) scale(1); }
-    50% { transform: translateY(calc(-50% - 3px)) scale(1.2); }
+    0% {
+        transform: translateY(calc(-50% - 3px)) scale(1);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        color: var(--pirate-gold);
+    }
+    40% {
+        transform: translateY(calc(-50% - 3px)) scale(1.35);
+        text-shadow: 0 0 24px var(--pirate-gold-light), 2px 2px 4px rgba(0, 0, 0, 0.8);
+        color: #fff8cc;
+    }
+    100% {
+        transform: translateY(calc(-50% - 3px)) scale(1);
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        color: var(--pirate-gold);
+    }
 }
 
-.spinner-left-container .result-display.rolling {
-    animation: pulseAnimationLeft 0.5s ease-in-out;
-}
-
+.spinner-left-container .result-display.rolling,
 .spinner-right-container .result-display.rolling {
-    animation: pulseAnimationRight 0.5s ease-in-out;
-}
-
-@keyframes pulseAnimationLeft {
-    0%, 100% { transform: translateY(calc(-50% - 3px)) scale(1); }
-    50% { transform: translateY(calc(-50% - 3px)) scale(1.2); }
-}
-
-@keyframes pulseAnimationRight {
-    0%, 100% { transform: translateY(calc(-50% - 3px)) scale(1); }
-    50% { transform: translateY(calc(-50% - 3px)) scale(1.2); }
+    animation: pulseAnimation 0.45s cubic-bezier(0.25, 1.4, 0.5, 1);
 }
 
 .label {
